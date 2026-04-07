@@ -60,14 +60,17 @@ npm run dev
 ---
 
 ## 📁 Project Structure
-- `controllers/` - Express API logic.
-- `db/` - Database schemas and SQL dumps.
-- `frontend/src/components/` - Isolated React UI modules.
-- `scripts/` - Maintenance and migration scripts.
-- `seed.js` - Large-scale database populator.
+- `config/` – Database configuration
+- `controllers/` – Business logic (API handlers)
+- `routes/` – API route definitions
+- `middleware/` – Authentication & request handling
+- `db/` – Schema and database dumps
+- `scripts/` – Migrations and seed scripts
+- `frontend/` – React (Vite) frontend
+- `docs/` – ER diagram and documentation
 
 ## ER Diagram
-- `docs/ER-Diagram.png` - ER Diagram of the database.
+![ER Diagram](docs/ER-Diagram.png)
 
 ---
 

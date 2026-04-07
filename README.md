@@ -66,6 +66,9 @@ npm run dev
 - `scripts/` - Maintenance and migration scripts.
 - `seed.js` - Large-scale database populator.
 
+## ER Diagram
+- `docs/ER-Diagram.png` - ER Diagram of the database.
+
 ---
 
 ## 📜 License

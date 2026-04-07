@@ -14,6 +14,11 @@ DBMS project for gym management including users, subscriptions, workouts, and pa
 - Backend: Express (if used)
 - Database: PostgreSQL
 
+## Database
+
+- schema.sql → Logical database design used for ER diagram
+- schema_dump.sql → PostgreSQL generated schema (actual DB structure)
+
 ## Setup Instructions
 1. Clone repo
 2. Install dependencies

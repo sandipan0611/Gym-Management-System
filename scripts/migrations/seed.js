@@ -1,10 +1,10 @@
-const { pool } = require('./config/db');
+const { pool } = require('../../config/db');
 const bcrypt = require('bcrypt');
 
 async function seed() {
     try {
         console.log("Starting large-scale database seed...");
-        
+
         // 1. Clear existing data
         await pool.query('DELETE FROM member_workouts');
         await pool.query('DELETE FROM payments');
@@ -43,7 +43,7 @@ async function seed() {
         for (let i = 1; i <= 10; i++) {
             const res = await pool.query(
                 `INSERT INTO users (name, email, password, role, phone, age) VALUES ($1, $2, $3, 'trainer', $4, $5) RETURNING id`,
-                [`Trainer ${i}`, `trainer${i}@gym.com`, defaultHashedPass, `555-10${i < 10 ? '0'+i : i}`, 25 + (i%15)]
+                [`Trainer ${i}`, `trainer${i}@gym.com`, defaultHashedPass, `555-10${i < 10 ? '0' + i : i}`, 25 + (i % 15)]
             );
             userIds.trainer.push(res.rows[0].id);
         }
@@ -51,7 +51,7 @@ async function seed() {
         for (let i = 1; i <= 30; i++) {
             const res = await pool.query(
                 `INSERT INTO users (name, email, password, role, phone, age) VALUES ($1, $2, $3, 'member', $4, $5) RETURNING id`,
-                [`Member ${i}`, `member${i}@gym.com`, defaultHashedPass, `555-20${i < 10 ? '0'+i : i}`, 20 + (i%20)]
+                [`Member ${i}`, `member${i}@gym.com`, defaultHashedPass, `555-20${i < 10 ? '0' + i : i}`, 20 + (i % 20)]
             );
             userIds.member.push(res.rows[0].id);
         }

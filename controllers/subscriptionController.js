@@ -1,6 +1,6 @@
 const db = require('../config/db');
 
-const getSubscriptions = async (req, res) => {
+const getSubscriptions = async (req, res, next) => {
     try {
         let query = 'SELECT s.*, p.name as plan_name, u.name as member_name FROM subscriptions s JOIN plans p ON s.plan_id = p.id JOIN users u ON s.member_id = u.id';
         const params = [];
@@ -11,12 +11,11 @@ const getSubscriptions = async (req, res) => {
         const subs = await db.query(query, params);
         res.json(subs.rows);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        next(err);
     }
 };
 
-const createSubscription = async (req, res) => {
+const createSubscription = async (req, res, next) => {
     try {
         const { plan_id } = req.body;
         const member_id = req.user.role === 'member' ? req.user.id : req.body.member_id;
@@ -31,8 +30,7 @@ const createSubscription = async (req, res) => {
         );
         res.status(201).json(newSub.rows[0]);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        next(err);
     }
 };
 

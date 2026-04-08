@@ -1,6 +1,6 @@
 const db = require('../config/db');
 
-const markAttendance = async (req, res) => {
+const markAttendance = async (req, res, next) => {
     try {
         const member_id = req.user.role === 'member' ? req.user.id : req.body.member_id;
         
@@ -19,12 +19,11 @@ const markAttendance = async (req, res) => {
         );
         res.status(201).json({ message: "Attendance marked", data: attendance.rows[0] });
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        next(err);
     }
 };
 
-const getAttendance = async (req, res) => {
+const getAttendance = async (req, res, next) => {
     try {
         const member_id = req.user.role === 'member' ? req.user.id : req.params.member_id;
         
@@ -41,8 +40,7 @@ const getAttendance = async (req, res) => {
         const stats = await db.query(query, params);
         res.json(stats.rows);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        next(err);
     }
 };
 

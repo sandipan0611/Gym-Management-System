@@ -1,16 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
+const authorize = require('../middleware/authorize');
 const { getTrainerAssignments, getAdminDashboard } = require('../controllers/dashboardController');
 
-// @route   GET api/dashboard/trainer
-// @desc    Get assignments for the logged-in trainer
-// @access  Private (Trainer)
-router.get('/trainer', auth, getTrainerAssignments);
+router.use(auth);
 
-// @route   GET api/dashboard/admin
-// @desc    Get complete gym stats and all assignments
-// @access  Private (Admin)
-router.get('/admin', auth, getAdminDashboard);
+// Private (Trainer)
+router.get('/trainer', authorize('trainer'), getTrainerAssignments);
+
+// Private (Admin)
+router.get('/admin', authorize('admin'), getAdminDashboard);
 
 module.exports = router;

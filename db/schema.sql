@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     role VARCHAR(20) DEFAULT 'member' CHECK (role IN ('admin', 'trainer', 'member')),
     phone VARCHAR(20),
     age INT,
+    status VARCHAR(20) DEFAULT 'active',
     joining_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -31,7 +32,7 @@ CREATE TABLE IF NOT EXISTS subscriptions (
     plan_id INT REFERENCES plans(id) ON DELETE CASCADE,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
-    status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'expired', 'canceled'))
+    status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'expired', 'cancelled'))
 );
 
 CREATE TABLE IF NOT EXISTS payments (
@@ -52,6 +53,7 @@ CREATE TABLE IF NOT EXISTS member_workouts (
     id SERIAL PRIMARY KEY,
     member_id INT REFERENCES users(id) ON DELETE CASCADE,
     trainer_id INT REFERENCES trainers(id) ON DELETE SET NULL,
+    previous_trainer_id INTEGER REFERENCES trainers(id),
     workout_id INT REFERENCES workouts(id) ON DELETE CASCADE,
     assigned_date DATE DEFAULT CURRENT_DATE
 );
@@ -61,3 +63,7 @@ CREATE TABLE IF NOT EXISTS attendance (
     member_id INT REFERENCES users(id) ON DELETE CASCADE,
     check_in_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_subscriptions_member ON subscriptions(member_id);
+CREATE INDEX idx_attendance_member ON attendance(member_id);

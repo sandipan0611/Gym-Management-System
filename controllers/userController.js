@@ -1,28 +1,25 @@
 const db = require('../config/db');
-
 const bcrypt = require('bcrypt');
 
-const getMembers = async (req, res) => {
+const getMembers = async (req, res, next) => {
     try {
         const members = await db.query("SELECT id, name, email, phone, age, joining_date FROM users WHERE role = 'member'");
         res.json(members.rows);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        next(err);
     }
 };
 
-const getTrainers = async (req, res) => {
+const getTrainers = async (req, res, next) => {
     try {
         const trainers = await db.query("SELECT u.id, u.name, u.email, u.phone, t.specialization, t.available_from, t.available_to FROM users u LEFT JOIN trainers t ON u.id = t.user_id WHERE u.role = 'trainer'");
         res.json(trainers.rows);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        next(err);
     }
 };
 
-const changePassword = async (req, res) => {
+const changePassword = async (req, res, next) => {
     try {
         const { currentPassword, newPassword } = req.body;
         const userId = req.user.id;
@@ -40,8 +37,7 @@ const changePassword = async (req, res) => {
         
         res.json({ message: 'Password updated successfully' });
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        next(err);
     }
 };
 

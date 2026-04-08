@@ -1,7 +1,7 @@
 const db = require('../config/db');
 const bcrypt = require('bcrypt');
 
-const getTrainers = async (req, res) => {
+const getTrainers = async (req, res, next) => {
     try {
         const trainers = await db.query(`
             SELECT u.id as user_id, u.name, u.email, u.status, tr.id as trainer_id, tr.specialization
@@ -12,12 +12,11 @@ const getTrainers = async (req, res) => {
         `);
         res.json(trainers.rows);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        next(err);
     }
 };
 
-const hireTrainer = async (req, res) => {
+const hireTrainer = async (req, res, next) => {
     try {
         const { name, email, password, phone, age, specialization } = req.body;
         const salt = await bcrypt.genSalt(10);
@@ -35,12 +34,11 @@ const hireTrainer = async (req, res) => {
         );
         res.status(201).json({ msg: 'Trainer hired successfully' });
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        next(err);
     }
 };
 
-const fireTrainer = async (req, res) => {
+const fireTrainer = async (req, res, next) => {
     try {
         const { id } = req.params; // this is the users.id
         
@@ -53,12 +51,11 @@ const fireTrainer = async (req, res) => {
         }
         res.json({ msg: 'Trainer removed and assignments cleared' });
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        next(err);
     }
 };
 
-const replaceTrainer = async (req, res) => {
+const replaceTrainer = async (req, res, next) => {
     try {
         const { id } = req.params; // old users.id
         
@@ -99,12 +96,11 @@ const replaceTrainer = async (req, res) => {
         
         res.status(201).json({ msg: 'Replacement successful' });
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        next(err);
     }
 };
 
-const assignMember = async (req, res) => {
+const assignMember = async (req, res, next) => {
     try {
         const { member_id, trainer_id, workout_id } = req.body;
         
@@ -118,12 +114,11 @@ const assignMember = async (req, res) => {
         }
         res.json({ msg: 'Assignment updated' });
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        next(err);
     }
 };
 
-const getMembers = async (req, res) => {
+const getMembers = async (req, res, next) => {
     try {
         const members = await db.query(`SELECT id, name, email FROM users WHERE role = 'member'`);
         res.json(members.rows);

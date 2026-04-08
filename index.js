@@ -11,6 +11,7 @@ const attendanceRoutes = require('./routes/attendanceRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
@@ -33,6 +34,9 @@ app.use('/api/admin', adminRoutes);
 app.get('/', (req, res) => {
     res.send('Gym Membership System API is running.');
 });
+
+// Error Handler (must be after routes)
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

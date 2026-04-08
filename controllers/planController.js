@@ -1,16 +1,15 @@
 const db = require('../config/db');
 
-const getPlans = async (req, res) => {
+const getPlans = async (req, res, next) => {
     try {
         const plans = await db.query('SELECT * FROM plans');
         res.json(plans.rows);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        next(err);
     }
 };
 
-const createPlan = async (req, res) => {
+const createPlan = async (req, res, next) => {
     try {
         if(req.user.role !== 'admin') {
             return res.status(403).json({message: 'Authorization denied'});
@@ -22,11 +21,10 @@ const createPlan = async (req, res) => {
         );
         res.status(201).json(newPlan.rows[0]);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        next(err);
     }
 };
-const updatePlan = async (req, res) => {
+const updatePlan = async (req, res, next) => {
     try {
         if(req.user.role !== 'admin') {
             return res.status(403).json({message: 'Authorization denied'});
@@ -42,8 +40,7 @@ const updatePlan = async (req, res) => {
         }
         res.json(updatedPlan.rows[0]);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        next(err);
     }
 };
 

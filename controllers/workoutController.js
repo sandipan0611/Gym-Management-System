@@ -1,16 +1,15 @@
 const db = require('../config/db');
 
-const getWorkouts = async (req, res) => {
+const getWorkouts = async (req, res, next) => {
     try {
         const workouts = await db.query('SELECT * FROM workouts');
         res.json(workouts.rows);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        next(err);
     }
 };
 
-const assignWorkout = async (req, res) => {
+const assignWorkout = async (req, res, next) => {
     try {
         const { member_id, workout_id } = req.body;
         const trainer_id = req.user.role === 'trainer' ? req.user.id : null;
@@ -21,12 +20,11 @@ const assignWorkout = async (req, res) => {
         );
         res.status(201).json(assigned.rows[0]);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        next(err);
     }
 };
 
-const getMemberWorkouts = async (req, res) => {
+const getMemberWorkouts = async (req, res, next) => {
     try {
         const member_id = req.user.role === 'member' ? req.user.id : req.params.member_id;
         const workouts = await db.query(
@@ -35,8 +33,7 @@ const getMemberWorkouts = async (req, res) => {
         );
         res.json(workouts.rows);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        next(err);
     }
 };
 

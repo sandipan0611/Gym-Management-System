@@ -1,6 +1,6 @@
 const db = require('../config/db');
 
-const getTrainerAssignments = async (req, res) => {
+const getTrainerAssignments = async (req, res, next) => {
     try {
         if (req.user.role !== 'trainer') {
             return res.status(403).json({ msg: 'Access denied' });
@@ -18,12 +18,11 @@ const getTrainerAssignments = async (req, res) => {
         );
         res.json(assignments.rows);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        next(err);
     }
 };
 
-const getAdminDashboard = async (req, res) => {
+const getAdminDashboard = async (req, res, next) => {
     try {
         if (req.user.role !== 'admin') {
             return res.status(403).json({ msg: 'Access denied' });
@@ -57,8 +56,7 @@ const getAdminDashboard = async (req, res) => {
             assignments: assignments.rows
         });
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        next(err);
     }
 };
 

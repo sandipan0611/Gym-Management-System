@@ -1,21 +1,27 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
-const { getTrainers, hireTrainer, fireTrainer, replaceTrainer, assignMember, getMembers } = require('../controllers/adminController');
+const authorize = require('../middleware/authorize');
+const validate = require('../middleware/validate');
+const { hireTrainerRules, assignMemberRules } = require('../validators/adminValidator');
+const { getTrainers, getMembers, hireTrainer, fireTrainer, replaceTrainer, assignMember } = require('../controllers/adminController');
 
-// Ensure only admins can hit these routes
-const adminAuth = (req, res, next) => {
-    if (req.user.role !== 'admin') {
-        return res.status(403).json({ msg: 'Admin authorization denied' });
-    }
-    next();
-};
+// GET /api/admin/trainers
+router.get('/trainers', auth, authorize('admin'), getTrainers);
 
-router.get('/trainers', [auth, adminAuth], getTrainers);
-router.post('/trainers', [auth, adminAuth], hireTrainer);
-router.put('/trainers/:id/fire', [auth, adminAuth], fireTrainer);
-router.post('/trainers/:id/replace', [auth, adminAuth], replaceTrainer);
-router.get('/members', [auth, adminAuth], getMembers);
-router.post('/assignments', [auth, adminAuth], assignMember);
+// POST /api/admin/trainers
+router.post('/trainers', auth, authorize('admin'), hireTrainerRules, validate, hireTrainer);
+
+// PUT /api/admin/trainers/:id/fire
+router.put('/trainers/:id/fire', auth, authorize('admin'), fireTrainer);
+
+// POST /api/admin/trainers/:id/replace
+router.post('/trainers/:id/replace', auth, authorize('admin'), replaceTrainer);
+
+// GET /api/admin/members
+router.get('/members', auth, authorize('admin'), getMembers);
+
+// POST /api/admin/assignments
+router.post('/assignments', auth, authorize('admin'), assignMemberRules, validate, assignMember);
 
 module.exports = router;

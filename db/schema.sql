@@ -1,3 +1,6 @@
+-- Gym Management System — Canonical Schema
+-- Run this on a fresh PostgreSQL database named gym_db
+
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -6,6 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
     role VARCHAR(20) DEFAULT 'member' CHECK (role IN ('admin', 'trainer', 'member')),
     phone VARCHAR(20),
     age INT,
+    status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'removed', 'replaced')),
     joining_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -31,7 +35,7 @@ CREATE TABLE IF NOT EXISTS subscriptions (
     plan_id INT REFERENCES plans(id) ON DELETE CASCADE,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
-    status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'expired', 'canceled'))
+    status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'expired', 'cancelled'))
 );
 
 CREATE TABLE IF NOT EXISTS payments (
@@ -52,6 +56,7 @@ CREATE TABLE IF NOT EXISTS member_workouts (
     id SERIAL PRIMARY KEY,
     member_id INT REFERENCES users(id) ON DELETE CASCADE,
     trainer_id INT REFERENCES trainers(id) ON DELETE SET NULL,
+    previous_trainer_id INT REFERENCES trainers(id) ON DELETE SET NULL,
     workout_id INT REFERENCES workouts(id) ON DELETE CASCADE,
     assigned_date DATE DEFAULT CURRENT_DATE
 );
@@ -61,3 +66,10 @@ CREATE TABLE IF NOT EXISTS attendance (
     member_id INT REFERENCES users(id) ON DELETE CASCADE,
     check_in_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Indexes for frequently queried fields
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
+CREATE INDEX IF NOT EXISTS idx_subscriptions_member ON subscriptions(member_id);
+CREATE INDEX IF NOT EXISTS idx_attendance_member ON attendance(member_id);
+CREATE INDEX IF NOT EXISTS idx_member_workouts_member ON member_workouts(member_id);

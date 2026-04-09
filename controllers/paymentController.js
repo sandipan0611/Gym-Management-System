@@ -1,6 +1,6 @@
 const db = require('../config/db');
 
-const getPayments = async (req, res) => {
+const getPayments = async (req, res, next) => {
     try {
         let query = 'SELECT p.*, s.status as subscription_status, u.name as member_name FROM payments p JOIN subscriptions s ON p.subscription_id = s.id JOIN users u ON s.member_id = u.id';
         const params = [];
@@ -13,12 +13,11 @@ const getPayments = async (req, res) => {
         const payments = await db.query(query, params);
         res.json(payments.rows);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        next(err);
     }
 };
 
-const recordPayment = async (req, res) => {
+const recordPayment = async (req, res, next) => {
     try {
         const { subscription_id, amount, status } = req.body;
         const newPayment = await db.query(
@@ -27,8 +26,7 @@ const recordPayment = async (req, res) => {
         );
         res.status(201).json(newPayment.rows[0]);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        next(err);
     }
 };
 

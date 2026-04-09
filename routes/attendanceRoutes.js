@@ -4,13 +4,13 @@ const auth = require('../middleware/auth');
 const authorize = require('../middleware/authorize');
 const { markAttendance, getAttendance } = require('../controllers/attendanceController');
 
-// POST /api/attendance — member checks in
-router.post('/', auth, authorize('member', 'admin'), markAttendance);
+router.use(auth);
 
-// GET /api/attendance — member or admin views own/all attendance
-router.get('/', auth, authorize('member', 'admin'), getAttendance);
+// Members and staff can mark attendance
+router.post('/', markAttendance);
 
-// GET /api/attendance/:member_id — admin views specific member's attendance
-router.get('/:member_id', auth, authorize('admin'), getAttendance);
+// Only admin and trainers can see all attendance
+router.get('/', authorize('admin', 'trainer'), getAttendance);
+router.get('/:member_id', authorize('admin', 'trainer'), getAttendance);
 
 module.exports = router;

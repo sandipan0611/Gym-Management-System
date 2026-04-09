@@ -2,12 +2,14 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
 const authorize = require('../middleware/authorize');
-const { getTrainerDashboard, getAdminDashboard } = require('../controllers/dashboardController');
+const { getTrainerAssignments, getAdminDashboard } = require('../controllers/dashboardController');
 
-// GET /api/dashboard/trainer — trainer only
-router.get('/trainer', auth, authorize('trainer'), getTrainerDashboard);
+router.use(auth);
 
-// GET /api/dashboard/admin — admin only
-router.get('/admin', auth, authorize('admin'), getAdminDashboard);
+// Private (Trainer)
+router.get('/trainer', authorize('trainer'), getTrainerAssignments);
+
+// Private (Admin)
+router.get('/admin', authorize('admin'), getAdminDashboard);
 
 module.exports = router;

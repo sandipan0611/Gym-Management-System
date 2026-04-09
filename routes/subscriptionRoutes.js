@@ -4,10 +4,12 @@ const auth = require('../middleware/auth');
 const authorize = require('../middleware/authorize');
 const { getSubscriptions, createSubscription } = require('../controllers/subscriptionController');
 
-// GET /api/subscriptions
-router.get('/', auth, authorize('member', 'admin'), getSubscriptions);
+router.use(auth);
 
-// POST /api/subscriptions
-router.post('/', auth, authorize('member', 'admin'), createSubscription);
+// Members see their own, admin sees all
+router.get('/', getSubscriptions);
+
+// Any authenticated can subscribe (usually members)
+router.post('/', createSubscription);
 
 module.exports = router;

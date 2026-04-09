@@ -2,15 +2,18 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
 const authorize = require('../middleware/authorize');
-const { getWorkouts, getMemberWorkoutsController } = require('../controllers/workoutController');
+const { getWorkouts, assignWorkout, getMemberWorkouts } = require('../controllers/workoutController');
 
-// GET /api/workouts — all workout types (any authenticated user)
-router.get('/', auth, getWorkouts);
+router.use(auth);
 
-// GET /api/workouts/member — logged-in member's assigned workout
-router.get('/member', auth, authorize('member', 'admin'), getMemberWorkoutsController);
+// All authenticated can see workouts list
+router.get('/', getWorkouts);
 
-// GET /api/workouts/member/:member_id — admin fetch for specific member
-router.get('/member/:member_id', auth, authorize('admin'), getMemberWorkoutsController);
+// Only trainer/admin can assign workouts
+router.post('/assign', authorize('admin', 'trainer'), assignWorkout);
+
+// Members see their own, trainers/admin see theirs/all
+router.get('/member', getMemberWorkouts);
+router.get('/member/:member_id', authorize('admin', 'trainer'), getMemberWorkouts);
 
 module.exports = router;

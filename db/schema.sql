@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
     role VARCHAR(20) DEFAULT 'member' CHECK (role IN ('admin', 'trainer', 'member')),
     phone VARCHAR(20),
     age INT,
-    status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'removed', 'replaced')),
+    status VARCHAR(20) DEFAULT 'active',
     joining_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -58,6 +58,7 @@ CREATE TABLE IF NOT EXISTS member_workouts (
     trainer_id INT REFERENCES trainers(id) ON DELETE SET NULL,
     previous_trainer_id INT REFERENCES trainers(id) ON DELETE SET NULL,
     workout_id INT REFERENCES workouts(id) ON DELETE CASCADE,
+    previous_trainer_id INT REFERENCES trainers(id) ON DELETE SET NULL,
     assigned_date DATE DEFAULT CURRENT_DATE
 );
 

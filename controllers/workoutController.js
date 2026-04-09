@@ -2,17 +2,39 @@ const { getAllWorkouts, getMemberWorkouts } = require('../services/workoutServic
 
 const getWorkouts = async (req, res, next) => {
     try {
-        const workouts = await getAllWorkouts();
-        res.json({ success: true, data: workouts });
-    } catch (err) { next(err); }
+        const workouts = await db.query('SELECT * FROM workouts');
+        res.json(workouts.rows);
+    } catch (err) {
+        next(err);
+    }
 };
 
-const getMemberWorkoutsController = async (req, res, next) => {
+const assignWorkout = async (req, res, next) => {
+    try {
+        const { member_id, workout_id } = req.body;
+        const trainer_id = req.user.role === 'trainer' ? req.user.id : null;
+
+        const assigned = await db.query(
+            'INSERT INTO member_workouts (member_id, trainer_id, workout_id) VALUES ($1, $2, $3) RETURNING *',
+            [member_id, trainer_id, workout_id]
+        );
+        res.status(201).json(assigned.rows[0]);
+    } catch (err) {
+        next(err);
+    }
+};
+
+const getMemberWorkouts = async (req, res, next) => {
     try {
         const member_id = req.user.role === 'member' ? req.user.id : req.params.member_id;
-        const workouts = await getMemberWorkouts(member_id);
-        res.json({ success: true, data: workouts });
-    } catch (err) { next(err); }
+        const workouts = await db.query(
+            'SELECT mw.*, w.name as workout_name, w.description, t.name as trainer_name FROM member_workouts mw JOIN workouts w ON mw.workout_id = w.id LEFT JOIN trainers tr ON mw.trainer_id = tr.id LEFT JOIN users t ON tr.user_id = t.id WHERE mw.member_id = $1',
+            [member_id]
+        );
+        res.json(workouts.rows);
+    } catch (err) {
+        next(err);
+    }
 };
 
 module.exports = { getWorkouts, getMemberWorkoutsController };

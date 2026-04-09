@@ -13,6 +13,7 @@ const attendanceRoutes = require('./routes/attendanceRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
@@ -39,7 +40,7 @@ app.get('/', (req, res) => {
     res.json({ success: true, message: 'Gym Management System API is running.' });
 });
 
-// Centralized error handler — must be LAST
+// Error Handler (must be after routes)
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;

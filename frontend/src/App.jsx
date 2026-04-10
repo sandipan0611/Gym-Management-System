@@ -2,14 +2,13 @@ import { useState, useEffect } from 'react';
 import './index.css';
 import bgImage from './assets/bg.png';
 
+import * as api from './services/api';
 import Authentication from './components/Authentication';
 import AdminDashboard from './components/AdminDashboard';
 import TrainerDashboard from './components/TrainerDashboard';
 import MemberDashboard from './components/MemberDashboard';
 import PricingTiers from './components/PricingTiers';
 import AccountSettings from './components/AccountSettings';
-
-const API_BASE = 'http://localhost:5000/api';
 
 const formatDate = (dateString) => {
     const d = new Date(dateString);
@@ -87,52 +86,48 @@ function App() {
   const fetchDashboardData = async () => {
      try {
        if (user.role === 'member') {
-           const subRes = await fetch(`${API_BASE}/subscriptions`, { headers: { 'Authorization': `Bearer ${token}` } });
-           if(subRes.ok) { const subData = await subRes.json(); setActivePlan(subData[0] || null); }
+           const subData = await api.getSubscriptions(token);
+           setActivePlan(subData.data[0] || null);
            
-           const workRes = await fetch(`${API_BASE}/workouts/member`, { headers: { 'Authorization': `Bearer ${token}` } });
-           if(workRes.ok) { const workData = await workRes.json(); setNextWorkout(workData[0] || null); }
+           const workData = await api.getMemberWorkouts(token);
+           setNextWorkout(workData.data[0] || null);
            
-           const attRes = await fetch(`${API_BASE}/attendance`, { headers: { 'Authorization': `Bearer ${token}` } });
-           if(attRes.ok) { const attData = await attRes.json(); setAttendanceList(attData); }
+           const attData = await api.getAttendance(token);
+           setAttendanceList(attData.data);
        } else if (user.role === 'trainer') {
-           const res = await fetch(`${API_BASE}/dashboard/trainer`, { headers: { 'Authorization': `Bearer ${token}` } });
-           if(res.ok) { const data = await res.json(); setTrainerAssignments(data); }
+           const data = await api.getTrainerDashboard(token);
+           setTrainerAssignments(data.data);
        } else if (user.role === 'admin') {
-           const res = await fetch(`${API_BASE}/dashboard/admin`, { headers: { 'Authorization': `Bearer ${token}` } });
-           if(res.ok) { const data = await res.json(); setAdminStats(data); }
+           const data = await api.getAdminDashboard(token);
+           setAdminStats(data.data);
        }
-     } catch (err) { console.error("Failed to load dashboard sync"); }
+     } catch (err) { console.error("Failed to load dashboard sync", err); }
   };
 
   const fetchStaffData = async () => {
-       try {
-           const tRes = await fetch(`${API_BASE}/admin/trainers`, { headers: { 'Authorization': `Bearer ${token}` } });
-           if(tRes.ok) setTrainers(await tRes.json());
-    
-           const mRes = await fetch(`${API_BASE}/admin/members`, { headers: { 'Authorization': `Bearer ${token}` } });
-           if(mRes.ok) setMembers(await mRes.json());
-           
-           const wRes = await fetch(`${API_BASE}/workouts`, { headers: { 'Authorization': `Bearer ${token}` } });
-           if(wRes.ok) setAllWorkouts(await wRes.json());
-       } catch (err) { console.error("Failed to fetch staff data", err); }
+        try {
+            const tData = await api.getTrainers(token);
+            setTrainers(tData.data);
+     
+            const mData = await api.getMembers(token);
+            setMembers(mData.data);
+            
+            const wData = await api.getWorkouts(token);
+            setAllWorkouts(wData.data);
+        } catch (err) { console.error("Failed to fetch staff data", err); }
   };
 
   const fetchPlans = async () => {
       try {
-          const res = await fetch(`${API_BASE}/plans`);
-          if(res.ok) setPlans(await res.json());
-      } catch (err) { console.error("Failed to load plans"); }
+          const res = await api.getPlans();
+          setPlans(res.data);
+      } catch (err) { console.error("Failed to load plans", err); }
   };
 
   const handleUpdatePlan = async (id, newPrice) => {
     try {
-        const res = await fetch(`${API_BASE}/plans/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-            body: JSON.stringify({ price: newPrice })
-        });
-        if(res.ok) fetchPlans();
+        await api.updatePlan(token, id, newPrice);
+        fetchPlans();
     } catch (err) { console.error(err); }
   };
 
@@ -144,20 +139,18 @@ function App() {
           phone: form.phone.value, age: form.age.value, specialization: form.specialization.value
       };
       try {
-          const res = await fetch(`${API_BASE}/admin/trainers`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-              body: JSON.stringify(data)
-          });
-          if(res.ok) { form.reset(); fetchStaffData(); }
+          await api.hireTrainer(token, data);
+          form.reset(); 
+          fetchStaffData();
       } catch (err) { console.error(err); }
   };
 
   const handleFireTrainer = async (userId) => {
       if(!window.confirm("Are you sure you want to mark this trainer as removed?")) return;
       try {
-          const res = await fetch(`${API_BASE}/admin/trainers/${userId}/fire`, { method: 'PUT', headers: { 'Authorization': `Bearer ${token}` } });
-          if(res.ok) { fetchStaffData(); if (currentPage === 'dashboard') fetchDashboardData(); }
+          await api.fireTrainer(token, userId);
+          fetchStaffData(); 
+          if (currentPage === 'dashboard') fetchDashboardData();
       } catch (err) { console.error(err); }
   };
 
@@ -169,12 +162,9 @@ function App() {
       if(!window.confirm(`Are you sure you want to completely replace ${t.name} and assign all their old members to this new hire?`)) return;
 
       try {
-          const res = await fetch(`${API_BASE}/admin/trainers/${t.user_id}/replace`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-              body: JSON.stringify({ email: email, password: pwd, age: 25, specialization: t.specialization, name: t.name })
-          });
-          if(res.ok) { fetchStaffData(); alert("Trainer successfully replaced and legacy members reassigned!"); }
+          await api.replaceTrainer(token, t.user_id, { email: email, password: pwd, age: 25, specialization: t.specialization, name: t.name });
+          fetchStaffData(); 
+          alert("Trainer successfully replaced and legacy members reassigned!");
       } catch (err) { console.error(err); }
   };
 
@@ -182,12 +172,9 @@ function App() {
       e.preventDefault();
       const form = e.target;
       try {
-          const res = await fetch(`${API_BASE}/admin/assignments`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-              body: JSON.stringify({ member_id: form.member_id.value, trainer_id: form.trainer_id.value, workout_id: form.workout_id.value })
-          });
-          if(res.ok) { form.reset(); alert("Member correctly assigned."); }
+          await api.assignMember(token, { member_id: form.member_id.value, trainer_id: form.trainer_id.value, workout_id: form.workout_id.value });
+          form.reset(); 
+          alert("Member correctly assigned.");
       } catch (err) { console.error(err); }
   };
 
@@ -197,20 +184,20 @@ function App() {
     const email = e.target.email.value;
     const password = e.target.password.value;
     try {
-        const res = await fetch(`${API_BASE}/auth/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-        });
-        const data = await res.json();
-        if (res.ok) {
-            localStorage.setItem('jwt', data.token);
-            setToken(data.token); setUser(data.user); setCurrentPage('dashboard');
-        } else {
-            if (data.notFound) { setLoginEmail(email); setLoginPassword(password); setShowSignup(true); } 
-            else { setErrorMsg(data.message || "Invalid credentials"); }
+        const data = await api.login(email, password);
+        localStorage.setItem('jwt', data.token);
+        setToken(data.token); 
+        setUser(data.data); 
+        setCurrentPage('dashboard');
+    } catch (err) { 
+        if (err.notFound) { 
+            setLoginEmail(email); 
+            setLoginPassword(password); 
+            setShowSignup(true); 
+        } else { 
+            setErrorMsg(err.message || "Invalid credentials"); 
         }
-    } catch (err) { setErrorMsg("Unable to connect to server. Is it running?"); }
+    }
   };
 
   const handleSignup = async (e) => {
@@ -222,25 +209,20 @@ function App() {
           age: e.target.age.value, role: 'member'
       };
       try {
-          const res = await fetch(`${API_BASE}/auth/register`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(data)
-          });
-          const resData = await res.json();
-          if (res.ok) { alert("Successfully registered! Please hit 'Sign In' below."); setShowSignup(false); } 
-          else { setErrorMsg(resData.message || "Registration failed"); }
-      } catch (err) { setErrorMsg("Connection error"); }
+          await api.register(data);
+          alert("Successfully registered! Please hit 'Sign In' below."); 
+          setShowSignup(false);
+      } catch (err) { setErrorMsg(err.message || "Registration failed"); }
   };
 
   const handleCheckIn = async () => {
      try {
-        const res = await fetch(`${API_BASE}/attendance`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
-        if(res.ok) {
-             const data = await res.json();
-             setAttendanceList(prev => [data.data, ...prev]);
-        } else if (res.status === 400) alert((await res.json()).message);
-     } catch (err) { console.error("Check in error", err); }
+        const res = await api.markAttendance(token);
+        setAttendanceList(prev => [res.data, ...prev]);
+     } catch (err) { 
+        if (err.status === 400) alert(err.message);
+        else console.error("Check in error", err); 
+     }
   };
 
   const handleLogout = () => {
@@ -251,14 +233,12 @@ function App() {
   const handleJoinPlan = async (planId, planName) => {
       if(!window.confirm(`Are you sure you want to subscribe to the ${planName} plan? This will replace your current active plan.`)) return;
       try {
-          const res = await fetch(`${API_BASE}/subscriptions`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-              body: JSON.stringify({ plan_id: planId })
-          });
-          if(res.ok) { alert(`Successfully subscribed to ${planName}!`); setCurrentPage('dashboard'); } 
-          else { alert("Server failed to process your subscription"); }
-      } catch (err) { console.error(err); }
+          await api.createSubscription(token, { plan_id: planId });
+          alert(`Successfully subscribed to ${planName}!`); 
+          setCurrentPage('dashboard');
+      } catch (err) { 
+          alert(err.message || "Server failed to process your subscription"); 
+      }
   };
 
   const renderPage = () => {
@@ -271,13 +251,13 @@ function App() {
         return (
             <div style={{width: '100%'}}>
                 {user?.role === 'admin' && <AdminDashboard 
-                                              adminStats={adminStats} trainers={trainers} members={members} allWorkouts={allWorkouts} 
-                                              handleHireTrainer={handleHireTrainer} handleFireTrainer={handleFireTrainer} 
-                                              handleReplaceTrainer={handleReplaceTrainer} handleAssignMember={handleAssignMember} />}
+                                               adminStats={adminStats} trainers={trainers} members={members} allWorkouts={allWorkouts} 
+                                               handleHireTrainer={handleHireTrainer} handleFireTrainer={handleFireTrainer} 
+                                               handleReplaceTrainer={handleReplaceTrainer} handleAssignMember={handleAssignMember} />}
                 {user?.role === 'trainer' && <TrainerDashboard trainerAssignments={trainerAssignments} />}
                 {user?.role === 'member' && <MemberDashboard 
-                                              activePlan={activePlan} nextWorkout={nextWorkout} attendanceList={attendanceList} 
-                                              handleCheckIn={handleCheckIn} formatDate={formatDate} formatTime={formatTime} />}
+                                               activePlan={activePlan} nextWorkout={nextWorkout} attendanceList={attendanceList} 
+                                               handleCheckIn={handleCheckIn} formatDate={formatDate} formatTime={formatTime} />}
                 <AccountSettings token={token} />
             </div>
         );

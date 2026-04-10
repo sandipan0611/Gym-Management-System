@@ -1,6 +1,5 @@
 import React from 'react';
-
-const API_BASE = 'http://localhost:5000/api';
+import * as api from '../services/api';
 
 const AccountSettings = ({ token }) => {
   const handleChangePassword = async (e) => {
@@ -14,21 +13,12 @@ const AccountSettings = ({ token }) => {
       }
       
       try {
-          const res = await fetch(`${API_BASE}/users/password`, {
-              method: 'PUT',
-              headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-              body: JSON.stringify({ currentPassword, newPassword })
-          });
-          const data = await res.json();
-          if (res.ok) {
-              alert(data.message);
-              e.target.reset();
-          } else {
-              alert(data.message);
-          }
+          const res = await api.changePassword(token, currentPassword, newPassword);
+          alert(res.message);
+          e.target.reset();
       } catch (err) {
           console.error(err);
-          alert("Error changing password");
+          alert(err.message || "Error changing password");
       }
   };
 

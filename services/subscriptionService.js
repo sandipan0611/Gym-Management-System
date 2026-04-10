@@ -1,5 +1,7 @@
 const db = require('../config/db');
 
+const paymentService = require('./paymentService');
+
 const getSubscriptions = async (user) => {
     let query = `
         SELECT s.*, p.name as plan_name, u.name as member_name 
@@ -24,6 +26,15 @@ const createSubscription = async (user, data) => {
     const member_id =
         user.role === 'member' ? user.id : data.member_id;
 
+    // Fetch plan price for payment record
+    const planRes = await db.query('SELECT price FROM plans WHERE id = $1', [plan_id]);
+    if (planRes.rows.length === 0) {
+        const err = new Error('Plan not found');
+        err.statusCode = 404;
+        throw err;
+    }
+    const amount = planRes.rows[0].price;
+
     // Cancel previous subscriptions
     await db.query(
         "UPDATE subscriptions SET status = 'cancelled' WHERE member_id = $1",
@@ -45,6 +56,13 @@ const createSubscription = async (user, data) => {
          RETURNING *`,
         [member_id, plan_id]
     );
+
+    // Record the payment
+    await paymentService.recordPayment({
+        subscription_id: newSub.rows[0].id,
+        amount: amount,
+        status: 'completed'
+    });
 
     return newSub.rows[0];
 };

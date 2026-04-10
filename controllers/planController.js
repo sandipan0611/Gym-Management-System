@@ -1,9 +1,9 @@
-const db = require('../config/db');
+const planService = require('../services/planService');
 
 const getPlans = async (req, res, next) => {
     try {
-        const plans = await db.query('SELECT * FROM plans');
-        res.json(plans.rows);
+        const plans = await planService.getPlans();
+        res.json({ success: true, data: plans });
     } catch (err) {
         next(err);
     }
@@ -12,33 +12,22 @@ const getPlans = async (req, res, next) => {
 const createPlan = async (req, res, next) => {
     try {
         if(req.user.role !== 'admin') {
-            return res.status(403).json({message: 'Authorization denied'});
+            return res.status(403).json({ success: false, message: 'Authorization denied' });
         }
-        const { name, duration_months, price, description } = req.body;
-        const newPlan = await db.query(
-            'INSERT INTO plans (name, duration_months, price, description) VALUES ($1, $2, $3, $4) RETURNING *',
-            [name, duration_months, price, description]
-        );
-        res.status(201).json(newPlan.rows[0]);
+        const result = await planService.createPlan(req.body);
+        res.status(201).json({ success: true, data: result });
     } catch (err) {
         next(err);
     }
 };
+
 const updatePlan = async (req, res, next) => {
     try {
         if(req.user.role !== 'admin') {
-            return res.status(403).json({message: 'Authorization denied'});
+            return res.status(403).json({ success: false, message: 'Authorization denied' });
         }
-        const { id } = req.params;
-        const { price } = req.body;
-        const updatedPlan = await db.query(
-            'UPDATE plans SET price = $1 WHERE id = $2 RETURNING *',
-            [price, id]
-        );
-        if (updatedPlan.rows.length === 0) {
-            return res.status(404).json({ message: 'Plan not found' });
-        }
-        res.json(updatedPlan.rows[0]);
+        const result = await planService.updatePlan(req.params.id, req.body);
+        res.json({ success: true, data: result });
     } catch (err) {
         next(err);
     }

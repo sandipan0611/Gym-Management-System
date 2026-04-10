@@ -1,31 +1,48 @@
-const attendanceService = require('../services/attendanceService');
+const db = require('../config/db');
 
-const markAttendance = async (req, res, next) => {
-    try {
-        const member_id =
-            req.user.role === 'member'
-                ? req.user.id
-                : req.body.member_id;
+const markAttendance = async (member_id) => {
+    const existing = await db.query(
+        'SELECT id FROM attendance WHERE member_id = $1 AND DATE(check_in_time) = CURRENT_DATE',
+        [member_id]
+    );
 
-        const result = await attendanceService.markAttendance(member_id);
-        res.status(201).json(result);
-    } catch (err) {
-        next(err);
+    if (existing.rows.length > 0) {
+        const err = new Error('Already checked in today');
+        err.statusCode = 400;
+        throw err;
     }
+
+    const attendance = await db.query(
+        'INSERT INTO attendance (member_id) VALUES ($1) RETURNING *',
+        [member_id]
+    );
+
+    return { 
+        message: "Attendance marked", 
+        data: attendance.rows[0] 
+    };
 };
 
-const getAttendance = async (req, res, next) => {
-    try {
-        const member_id =
-            req.user.role === 'member'
-                ? req.user.id
-                : req.params.member_id;
+const getAttendance = async (member_id) => {
+    let query = `
+        SELECT a.*, u.name as member_name 
+        FROM attendance a 
+        JOIN users u ON a.member_id = u.id
+    `;
+    const params = [];
 
-        const result = await attendanceService.getAttendance(member_id);
-        res.json(result);
-    } catch (err) {
-        next(err);
+    if (member_id) {
+        query += ' WHERE a.member_id = $1';
+        params.push(member_id);
     }
+
+    query += ' ORDER BY a.check_in_time DESC';
+
+    const result = await db.query(query, params);
+    return result.rows;
 };
 
-module.exports = { markAttendance, getAttendance };
+module.exports = { 
+    markAttendance, 
+    getAttendance 
+};

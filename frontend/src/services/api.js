@@ -152,3 +152,34 @@ export const changePassword = (token, currentPassword, newPassword) =>
         headers: getHeaders(token),
         body: JSON.stringify({ currentPassword, newPassword }),
     }).then(handleResponse);
+
+export const getProfile = (token) =>
+    fetch(`${BASE_URL}/users/profile`, {
+        headers: getHeaders(token),
+    }).then(handleResponse);
+
+export const updateProfile = (token, data) =>
+    fetch(`${BASE_URL}/users/profile`, {
+        method: 'PUT',
+        headers: getHeaders(token),
+        body: JSON.stringify(data),
+    }).then(handleResponse);
+
+// ── HEALTH METRICS ────────────────────────────────────────────────────
+export const getMetrics = (token) =>
+    fetch(`${BASE_URL}/metrics`, {
+        headers: getHeaders(token),
+    }).then(handleResponse);
+
+export const addMetric = (token, data) =>
+    fetch(`${BASE_URL}/metrics`, {
+        method: 'POST',
+        headers: getHeaders(token),
+        body: JSON.stringify(data),
+    }).then(handleResponse);
+
+// ── ADMIN INTELLIGENCE ────────────────────────────────────────────────
+export const getSuggestedTrainer = (token) =>
+    fetch(`${BASE_URL}/admin/suggested-trainer`, {
+        headers: getHeaders(token),
+    }).then(handleResponse);

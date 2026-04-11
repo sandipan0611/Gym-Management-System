@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const reportService = require('./reportService');
 
 const getTrainerAssignments = async (userId) => {
     const assignments = await db.query(
@@ -8,7 +9,7 @@ const getTrainerAssignments = async (userId) => {
          JOIN trainers tr ON mw.trainer_id = tr.id
          JOIN users u ON mw.member_id = u.id
          JOIN workouts w ON mw.workout_id = w.id
-         WHERE tr.user_id = $1`,
+         WHERE tr.user_id = $1 AND mw.is_active = TRUE`,
         [userId]
     );
 
@@ -38,7 +39,18 @@ const getAdminDashboard = async () => {
         JOIN trainers tr ON mw.trainer_id = tr.id
         JOIN users u_trainer ON tr.user_id = u_trainer.id
         JOIN workouts w ON mw.workout_id = w.id
+        WHERE mw.is_active = TRUE
     `);
+
+    // Fetch all analytics in parallel for performance
+    const [mrr, revenueByPlan, trainerLoad, attendanceTrend, peakHours, expiringSoon] = await Promise.all([
+        reportService.getMRR(),
+        reportService.getRevenueByPlan(),
+        reportService.getTrainerLoad(),
+        reportService.getAttendanceTrend(30),
+        reportService.getPeakHours(),
+        reportService.getExpiringSoon()
+    ]);
 
     return {
         population: {
@@ -46,6 +58,12 @@ const getAdminDashboard = async () => {
             trainers: parseInt(trainersCount.rows[0].count)
         },
         revenue: parseFloat(revenue.rows[0].total_revenue || 0),
+        mrr,
+        revenueByPlan,
+        trainerLoad,
+        attendanceTrend,
+        peakHours,
+        expiringSoon,
         assignments: assignments.rows
     };
 };
@@ -53,4 +71,4 @@ const getAdminDashboard = async () => {
 module.exports = {
     getTrainerAssignments,
     getAdminDashboard
-};
+};

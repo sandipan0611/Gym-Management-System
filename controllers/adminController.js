@@ -54,11 +54,21 @@ const getMembers = async (req, res, next) => {
     }
 };
 
+const getSuggestedTrainer = async (req, res, next) => {
+    try {
+        const trainer = await adminService.getSuggestedTrainer();
+        res.json({ success: true, data: trainer });
+    } catch (err) {
+        next(err);
+    }
+};
+
 module.exports = { 
     getTrainers, 
     hireTrainer, 
     fireTrainer, 
     replaceTrainer, 
     assignMember, 
-    getMembers 
+    getMembers,
+    getSuggestedTrainer
 };

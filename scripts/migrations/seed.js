@@ -111,8 +111,8 @@ async function seed() {
             const workoutId = workoutIds[i % workoutIds.length];
 
             await pool.query(`
-                INSERT INTO member_workouts (member_id, trainer_id, workout_id) VALUES
-                ($1, $2, $3)
+                INSERT INTO member_workouts (member_id, trainer_id, workout_id, is_active) VALUES
+                ($1, $2, $3, TRUE)
             `, [memberId, trainerPk, workoutId]);
         }
         console.log("Assigned everyone a randomly distributed workout strategy.");

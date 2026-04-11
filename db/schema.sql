@@ -55,7 +55,8 @@ CREATE TABLE IF NOT EXISTS member_workouts (
     trainer_id INT REFERENCES trainers(id) ON DELETE SET NULL,
     workout_id INT REFERENCES workouts(id) ON DELETE CASCADE,
     previous_trainer_id INT REFERENCES trainers(id) ON DELETE SET NULL,
-    assigned_date DATE DEFAULT CURRENT_DATE
+    assigned_date DATE DEFAULT CURRENT_DATE,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 CREATE TABLE IF NOT EXISTS attendance (
@@ -63,3 +64,14 @@ CREATE TABLE IF NOT EXISTS attendance (
     member_id INT REFERENCES users(id) ON DELETE CASCADE,
     check_in_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Tier 2: Health metrics tracking per member
+CREATE TABLE IF NOT EXISTS member_metrics (
+    id SERIAL PRIMARY KEY,
+    member_id INT REFERENCES users(id) ON DELETE CASCADE,
+    weight_kg NUMERIC(5, 2),
+    bmi NUMERIC(5, 2),
+    body_fat_pct NUMERIC(5, 2),
+    recorded_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+

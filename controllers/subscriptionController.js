@@ -1,15 +1,9 @@
-const { getSubscriptionsForUser, createOrReplaceSubscription } = require('../services/subscriptionService');
+const subscriptionService = require('../services/subscriptionService');
 
 const getSubscriptions = async (req, res, next) => {
     try {
-        let query = 'SELECT s.*, p.name as plan_name, u.name as member_name FROM subscriptions s JOIN plans p ON s.plan_id = p.id JOIN users u ON s.member_id = u.id';
-        const params = [];
-        if (req.user.role === 'member') {
-            query += ' WHERE s.member_id = $1';
-            params.push(req.user.id);
-        }
-        const subs = await db.query(query, params);
-        res.json(subs.rows);
+        const subs = await subscriptionService.getSubscriptions(req.user);
+        res.json({ success: true, data: subs });
     } catch (err) {
         next(err);
     }
@@ -17,21 +11,8 @@ const getSubscriptions = async (req, res, next) => {
 
 const createSubscription = async (req, res, next) => {
     try {
-        const { plan_id } = req.body;
-        if (!plan_id) {
-            return res.status(400).json({ success: false, message: 'plan_id is required' });
-        }
-        const member_id = req.user.role === 'member' ? req.user.id : req.body.member_id;
-        
-        await db.query("UPDATE subscriptions SET status = 'cancelled' WHERE member_id = $1", [member_id]);
-        
-        const newSub = await db.query(
-            `INSERT INTO subscriptions (member_id, plan_id, start_date, end_date, status) 
-             VALUES ($1, $2, CURRENT_DATE, CURRENT_DATE + (SELECT duration_months FROM plans WHERE id = $2) * INTERVAL '1 month', 'active') 
-             RETURNING *`,
-            [member_id, plan_id]
-        );
-        res.status(201).json(newSub.rows[0]);
+        const result = await subscriptionService.createSubscription(req.user, req.body);
+        res.status(201).json({ success: true, data: result });
     } catch (err) {
         next(err);
     }

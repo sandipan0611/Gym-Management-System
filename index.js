@@ -2,8 +2,6 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
-const errorHandler = require('./middleware/errorHandler');
-
 const authRoutes = require('./routes/authRoutes');
 const planRoutes = require('./routes/planRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
@@ -13,6 +11,7 @@ const attendanceRoutes = require('./routes/attendanceRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const metricsRoutes = require('./routes/metricsRoutes');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -20,7 +19,7 @@ const app = express();
 // Middleware
 app.use(cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-    credentials: true,
+    credentials: true
 }));
 app.use(express.json());
 
@@ -34,10 +33,11 @@ app.use('/api/attendance', attendanceRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/metrics', metricsRoutes);
 
 // Health check
 app.get('/', (req, res) => {
-    res.json({ success: true, message: 'Gym Management System API is running.' });
+    res.json({ success: true, message: 'Gym Membership System API is running.' });
 });
 
 // Error Handler (must be after routes)

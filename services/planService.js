@@ -1,24 +1,45 @@
 const db = require('../config/db');
 
-const getAllPlans = async () => {
-    const result = await db.query('SELECT * FROM plans ORDER BY price ASC');
-    return result.rows;
+const getPlans = async () => {
+    const plans = await db.query('SELECT * FROM plans');
+    return plans.rows;
 };
 
-const modifyPlanPrice = async (id, price) => {
-    const result = await db.query(
-        'UPDATE plans SET price = $1 WHERE id = $2 RETURNING *',
-        [price, id]
-    );
-    return result.rows[0] || null;
-};
+const createPlan = async (data) => {
+    const { name, duration_months, price, description } = data;
 
-const addPlan = async ({ name, duration_months, price, description }) => {
-    const result = await db.query(
-        'INSERT INTO plans (name, duration_months, price, description) VALUES ($1, $2, $3, $4) RETURNING *',
+    const newPlan = await db.query(
+        `INSERT INTO plans (name, duration_months, price, description)
+         VALUES ($1, $2, $3, $4)
+         RETURNING *`,
         [name, duration_months, price, description]
     );
-    return result.rows[0];
+
+    return newPlan.rows[0];
 };
 
-module.exports = { getAllPlans, modifyPlanPrice, addPlan };
+const updatePlan = async (id, data) => {
+    const { price } = data;
+
+    const updatedPlan = await db.query(
+        `UPDATE plans 
+         SET price = $1 
+         WHERE id = $2 
+         RETURNING *`,
+        [price, id]
+    );
+
+    if (updatedPlan.rows.length === 0) {
+        const err = new Error('Plan not found');
+        err.statusCode = 404;
+        throw err;
+    }
+
+    return updatedPlan.rows[0];
+};
+
+module.exports = {
+    getPlans,
+    createPlan,
+    updatePlan
+};

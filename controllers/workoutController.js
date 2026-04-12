@@ -1,9 +1,9 @@
-const { getAllWorkouts, getMemberWorkouts } = require('../services/workoutService');
+const workoutService = require('../services/workoutService');
 
 const getWorkouts = async (req, res, next) => {
     try {
-        const workouts = await db.query('SELECT * FROM workouts');
-        res.json(workouts.rows);
+        const workouts = await workoutService.getWorkouts();
+        res.json({ success: true, data: workouts });
     } catch (err) {
         next(err);
     }
@@ -11,14 +11,8 @@ const getWorkouts = async (req, res, next) => {
 
 const assignWorkout = async (req, res, next) => {
     try {
-        const { member_id, workout_id } = req.body;
-        const trainer_id = req.user.role === 'trainer' ? req.user.id : null;
-
-        const assigned = await db.query(
-            'INSERT INTO member_workouts (member_id, trainer_id, workout_id) VALUES ($1, $2, $3) RETURNING *',
-            [member_id, trainer_id, workout_id]
-        );
-        res.status(201).json(assigned.rows[0]);
+        const result = await workoutService.assignWorkout(req.user, req.body);
+        res.status(201).json({ success: true, data: result });
     } catch (err) {
         next(err);
     }
@@ -27,14 +21,11 @@ const assignWorkout = async (req, res, next) => {
 const getMemberWorkouts = async (req, res, next) => {
     try {
         const member_id = req.user.role === 'member' ? req.user.id : req.params.member_id;
-        const workouts = await db.query(
-            'SELECT mw.*, w.name as workout_name, w.description, t.name as trainer_name FROM member_workouts mw JOIN workouts w ON mw.workout_id = w.id LEFT JOIN trainers tr ON mw.trainer_id = tr.id LEFT JOIN users t ON tr.user_id = t.id WHERE mw.member_id = $1',
-            [member_id]
-        );
-        res.json(workouts.rows);
+        const data = await workoutService.getMemberWorkouts(req.user, member_id);
+        res.json({ success: true, data });
     } catch (err) {
         next(err);
     }
 };
 
-module.exports = { getWorkouts, getMemberWorkoutsController };
+module.exports = { getWorkouts, assignWorkout, getMemberWorkouts };

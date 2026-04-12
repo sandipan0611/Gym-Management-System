@@ -3,13 +3,16 @@ const bcrypt = require('bcrypt');
 
 const getTrainers = async () => {
     const trainers = await db.query(`
-        SELECT u.id as user_id, u.name, u.email, u.status, tr.id as trainer_id, tr.specialization
+        SELECT u.id as user_id, u.name, u.email, u.status, tr.id as trainer_id, tr.specialization,
+               COUNT(mw.id) FILTER (WHERE mw.is_active = TRUE) AS member_count
         FROM users u
         JOIN trainers tr ON u.id = tr.user_id
+        LEFT JOIN member_workouts mw ON mw.trainer_id = tr.id
         WHERE u.role = 'trainer'
+        GROUP BY u.id, u.name, u.email, u.status, tr.id, tr.specialization
         ORDER BY u.id DESC
     `);
-    return trainers.rows;
+    return trainers.rows.map(r => ({ ...r, member_count: parseInt(r.member_count) }));
 };
 
 const hireTrainer = async (data) => {
@@ -153,11 +156,27 @@ const getMembers = async () => {
     return members.rows;
 };
 
+const getSuggestedTrainer = async () => {
+    const result = await db.query(`
+        SELECT u.id as user_id, u.name, tr.id as trainer_id, tr.specialization,
+               COUNT(mw.id) FILTER (WHERE mw.is_active = TRUE) AS member_count
+        FROM users u
+        JOIN trainers tr ON u.id = tr.user_id
+        LEFT JOIN member_workouts mw ON mw.trainer_id = tr.id
+        WHERE u.status = 'active' AND u.role = 'trainer'
+        GROUP BY u.id, u.name, tr.id, tr.specialization
+        ORDER BY member_count ASC
+        LIMIT 1
+    `);
+    return result.rows[0] || null;
+};
+
 module.exports = {
     getTrainers,
     hireTrainer,
     fireTrainer,
     replaceTrainer,
     assignMember,
-    getMembers
+    getMembers,
+    getSuggestedTrainer
 };

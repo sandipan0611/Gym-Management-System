@@ -11,6 +11,7 @@ const attendanceRoutes = require('./routes/attendanceRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const metricsRoutes = require('./routes/metricsRoutes');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -32,6 +33,7 @@ app.use('/api/attendance', attendanceRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/metrics', metricsRoutes);
 
 // Health check
 app.get('/', (req, res) => {

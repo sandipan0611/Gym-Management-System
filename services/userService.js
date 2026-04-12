@@ -57,8 +57,38 @@ const changePassword = async (userId, data) => {
     return { message: 'Password updated successfully' };
 };
 
+const getProfile = async (userId) => {
+    const result = await db.query(
+        `SELECT id, name, email, phone, age, role, joining_date
+         FROM users WHERE id = $1`,
+        [userId]
+    );
+    if (result.rows.length === 0) {
+        const err = new Error('User not found');
+        err.statusCode = 404;
+        throw err;
+    }
+    return result.rows[0];
+};
+
+const updateProfile = async (userId, data) => {
+    const { name, phone, age } = data;
+    const result = await db.query(
+        `UPDATE users
+         SET name  = COALESCE($1, name),
+             phone = COALESCE($2, phone),
+             age   = COALESCE($3, age)
+         WHERE id = $4
+         RETURNING id, name, email, phone, age, role`,
+        [name || null, phone || null, age ? parseInt(age) : null, userId]
+    );
+    return result.rows[0];
+};
+
 module.exports = {
     getMembers,
     getTrainers,
-    changePassword
+    changePassword,
+    getProfile,
+    updateProfile
 };

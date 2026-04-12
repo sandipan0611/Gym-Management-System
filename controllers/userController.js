@@ -1,5 +1,6 @@
 const userService = require('../services/userService');
 
+
 const getMembers = async (req, res, next) => {
     try {
         const members = await userService.getMembers();
@@ -27,4 +28,22 @@ const changePassword = async (req, res, next) => {
     }
 };
 
-module.exports = { getMembers, getTrainers, changePassword };
+const getProfile = async (req, res, next) => {
+    try {
+        const profile = await userService.getProfile(req.user.id);
+        res.json({ success: true, data: profile });
+    } catch (err) {
+        next(err);
+    }
+};
+
+const updateProfile = async (req, res, next) => {
+    try {
+        const updated = await userService.updateProfile(req.user.id, req.body);
+        res.json({ success: true, data: updated, message: 'Profile updated successfully' });
+    } catch (err) {
+        next(err);
+    }
+};
+
+module.exports = { getMembers, getTrainers, changePassword, getProfile, updateProfile };

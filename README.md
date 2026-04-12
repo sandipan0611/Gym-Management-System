@@ -1,4 +1,4 @@
-# 🏋️ Gym Management System
+# 🏋️ GYM.OS: Full-Stack Gym Management & Analytics System
 
 [![Node.js](https://img.shields.io/badge/Node.js-v22-339933?logo=nodedotjs)](https://nodejs.org/)
 [![Express](https://img.shields.io/badge/Express-v5-000000?logo=express)](https://expressjs.com/)
@@ -6,117 +6,98 @@
 [![React](https://img.shields.io/badge/React-v19-61DAFB?logo=react)](https://react.dev/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-A comprehensive, full-stack **Gym Management System** designed to streamline gym operations. This project features a robust **service-oriented architecture**, role-based access control (RBAC), and a synchronized database schema managed via **Prisma**.
+## 📖 Executive Summary
+**GYM.OS** is a comprehensive, full-stack enterprise solution designed to modernize gym operations. It leverages a modular **Service-Oriented Architecture (SOA)** to provide high-fidelity business intelligence for administrators and interactive health-tracking agency for members. The system features a premium **Glassmorphism UI** and advanced data visualization to bridge the gap between operational management and member experience.
 
 ---
 
-## 🚀 Key Features
+## 🚀 Core Functional Modules
 
-### 🔐 Secure Foundation
-- **Role-Based Access Control (RBAC)**: Secure dashboards for **Admins**, **Trainers**, and **Members**.
-- **Centralized Error Handling**: Robust middleware to ensure system stability and clean API responses.
-- **Input Validation**: Strict server-side validation using `express-validator`.
+### 📈 Administrative Intelligence
+Admins gain real-time visibility into gym performance through a centralized analytics hub:
+- **Financial Analytics**: Tracking of Monthly Recurring Revenue (MRR) and plan-specific revenue distribution.
+- **Operational Heatmaps**: Visualizing peak gym hours and member check-in trends to optimize staffing.
+- **Staffing Optimization**: Automated trainer-to-member load balancing and lifecycle management.
+- **Compliance Monitoring**: Automated alerts for expiring subscriptions and membership gaps.
 
-### ⚡ Gym Operations
-- **Trainer Succession Logic**: Advanced logic to fire or replace trainers while preserving member history and reassigning duties automatically.
-- **Subscription Pipeline**: Automated membership management — activate new plans while gracefully transitioning from old ones.
-- **Daily Attendance**: Enforced once-per-day check-in system with server-side constraints.
-- **Workout Assignment**: Precision mapping of members to trainers and specific workout routines.
-
----
-
-## 🛠️ Tech Stack
-
-| Layer | Technology |
-| :--- | :--- |
-| **Backend** | Node.js (v22), Express.js (v5) |
-| **Database** | PostgreSQL |
-| **ORM / Migration** | Prisma (Schema Management & Client) |
-| **Frontend** | React (v19), Vite, Vanilla CSS |
-| **Authentication** | JWT (JSON Web Tokens), bcrypt |
-| **Validation** | express-validator |
+### 🧘 Member Experience & Biometrics
+Members are empowered with tools to track their personal fitness journey:
+- **Biometric Progress Charts**: Interactive Line and Area charts visualizing Weight, BMI, and Body Fat % trends.
+- **Simplified Attendance**: One-click check-ins with localized system constraints.
+- **Routine Synchronization**: Direct access to assigned workout routines and trainer assignments.
+- **Unified Profile Control**: Self-service updates for personal vitals and authentication credentials.
 
 ---
 
-## 📁 Project Structure
+## 🛠️ Technical Implementation
 
+| Layer | Component | Technology |
+| :--- | :--- | :--- |
+| **Backend** | Runtime Environment | Node.js (v22), Express.js (v5) |
+| **Database** | Persistence Layer | PostgreSQL with Prisma ORM |
+| **Frontend** | Application Framework | React (v19), Vite |
+| **Visualization** | Intelligence Engine | **Recharts** |
+| **Security** | Authentication | JWT (Stateless), bcrypt (Hashing) |
+| **Design** | Aesthetics | **Glassmorphism System** (Vanilla CSS) |
+
+---
+
+## 📊 Architecture & Design
+
+### Database Architecture
+The system's relational structure is designed to handle complex mappings between memberships, staffing, and biometric history.
+
+![System ER Diagram](docs/ER-Diagram.png)
+
+### System Structure
+This project follows a strict service-oriented pattern to ensure scalability and ease of maintenance:
+
+#### ⚙️ Backend Logic
+- **`services/`**: The system's primary engine. Includes specialized logic like `reportService.js` for analytics and `metricsService.js` for health tracking.
+- **`controllers/`**: Handles request-response cycles, performing validation and delegating to the service layer.
+- **`middleware/`**: Houses global guards such as `auth.js` for security and `errorHandler.js` for unified exception handling.
+- **`prisma/schema.prisma`**: The definitive architectural map of the database schema.
+
+#### 🎨 Frontend Interface
+- **`frontend/src/App.jsx`**: The application hub, managing global state, role-based navigation, and data orchestration.
+- **`frontend/src/components/`**: 
+    - `AdminDashboard.jsx`: The pro-grade portal featuring Recharts analytics widgets.
+    - `MemberDashboard.jsx`: The personal progress hub for member biometrics.
+    - `AccountSettings.jsx`: The interface for secure profile and vitals management.
+
+---
+
+## ⚙️ Setup & Deployment
+
+### 1. Installation
 ```bash
-├── config/              # Configuration (DB connection pools)
-├── controllers/         # Request handlers (HTTP layer)
-├── db/                  # SQL schemas and migration dumps
-├── docs/                # Project documentation and ER diagrams
-├── frontend/            # React + Vite application
-├── middleware/          # Auth, authorization, and error handling
-├── prisma/              # Prisma schema and configuration
-├── routes/              # Express API route definitions
-├── services/            # Core business logic (Service Layer)
-├── validators/          # Modular validation rules
-└── index.js             # Application entry point
-```
-
----
-
-## ⚙️ Setup & Installation
-
-### 1. Prerequisites
-- **Node.js** (v18 or higher)
-- **PostgreSQL** (Active instance)
-
-### 2. Clone & Install Dependencies
-```bash
+# Clone the repository
 git clone https://github.com/sandipan0611/Gym-Management-System.git
 cd Gym-Management-System
 
-# Install Backend dependencies
+# Install system dependencies
 npm install
-
-# Install Frontend dependencies
 cd frontend && npm install && cd ..
 ```
 
-### 3. Environment Configuration
-Create a `.env` file in the root directory (refer to `.env.example`):
+### 2. Environment Configuration
+Create a `.env` file in the root directory:
 ```env
 PORT=5000
-DB_USER=postgres
-DB_HOST=localhost
-DB_NAME=gym_db
-DB_PASSWORD=your_password
-DB_PORT=5432
-JWT_SECRET=your_secret_key
-JWT_EXPIRES_IN=10h
-FRONTEND_URL=http://localhost:5173
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE"
+JWT_SECRET="your_secret_key_here"
+FRONTEND_URL="http://localhost:5173"
 ```
 
-### 4. Database Initialization
-Use Prisma to push the schema to your database:
+### 3. Activation
+Initialize the database and start the production environment:
 ```bash
 npx prisma db push
-```
-*(Alternatively, run the raw SQL from `db/schema.sql`)*
-
-### 5. Seeding Data
-Populate the database with initial users and plans:
-```bash
 npm run seed
+npm start
 ```
-
----
-
-## 🔌 API Summary
-
-| Feature | Endpoint | Method | Auth |
-| :--- | :--- | :--- | :--- |
-| **Auth** | `/api/auth/login` | `POST` | Public |
-| **Admin** | `/api/admin/trainers` | `POST` | Admin |
-| **Members** | `/api/subscriptions` | `POST` | Member |
-| **Attendance**| `/api/attendance` | `POST` | Member |
-| **Dashboard** | `/api/dashboard/trainer` | `GET` | Trainer |
-
-> [!TIP]
-> Use the [ER Diagram](docs/ER-Diagram.png) in the `docs` folder to understand the relationship between Entities.
 
 ---
 
 ## 📜 License
-This project is licensed under the **Apache License 2.0** — see the [LICENSE](LICENSE) file for details.
+Licensed under the **Apache License 2.0**.

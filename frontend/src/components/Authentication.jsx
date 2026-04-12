@@ -25,6 +25,9 @@ const Authentication = ({
                     <button type="button" className="premium-button" style={{ background: 'transparent', border: '1px solid var(--text-muted)' }} onClick={() => setShowSignup(false)}>
                       Cancel
                     </button>
+                    <button type="button" className="premium-button" style={{ background: 'transparent', border: 'none', color: 'var(--accent)', marginTop: '-0.5rem', fontSize: '0.85rem' }} onClick={() => setShowSignup(false)}>
+                      Sign In Instead
+                    </button>
                   </form>
               ) : (
                   <form onSubmit={handleLogin}>

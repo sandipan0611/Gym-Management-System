@@ -189,6 +189,8 @@ function App() {
           await api.assignMember(token, { member_id: form.member_id.value, trainer_id: form.trainer_id.value, workout_id: form.workout_id.value });
           form.reset();
           alert('Member correctly assigned.');
+          fetchDashboardData();
+          fetchStaffData();
       } catch (err) { console.error(err); }
   };
 
@@ -295,7 +297,7 @@ function App() {
     }
   };
 
-  if (currentPage !== 'login' && !token) {
+  if (currentPage !== 'login' && currentPage !== 'plans' && !token) {
     setCurrentPage('login');
     return null;
   }

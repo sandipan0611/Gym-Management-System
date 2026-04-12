@@ -43,7 +43,7 @@ const PricingTiers = ({ plans, user, setShowSignup, setCurrentPage, handleJoinPl
                             }}>Edit Price</button>
                         ) : user && user.role === 'trainer' ? null : (
                             <button className="premium-button" style={{ width: '100%' }} onClick={() => {
-                                if (!user) { setShowSignup(false); setCurrentPage('login'); }
+                                if (!user) { setShowSignup(true); setCurrentPage('login'); }
                                 else { handleJoinPlan(p.id, p.name); }
                             }}>Join Now</button>
                         )}

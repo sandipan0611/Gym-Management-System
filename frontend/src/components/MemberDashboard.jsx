@@ -161,19 +161,20 @@ const MemberDashboard = ({
                                     Trainer: <span style={{ color: 'var(--accent)' }}>{nextWorkout.trainer_name || 'Not Assigned'}</span>
                                 </p>
                                 <div style={{ marginTop: '1.5rem' }}>
-                                    <button
-                                        className="premium-button"
-                                        style={{
-                                            width: '100%',
-                                            background: checkedInToday ? '#10b981' : undefined,
-                                            transform: checkedInToday ? 'none' : undefined,
-                                            cursor: checkedInToday ? 'default' : 'pointer'
-                                        }}
-                                        onClick={checkedInToday ? undefined : handleCheckIn}
-                                        disabled={checkedInToday}
-                                    >
-                                        {checkedInToday ? 'Checked In Today! ✅' : 'Check In via App'}
-                                    </button>
+                                        <button
+                                            className="premium-button"
+                                            style={{
+                                                width: '100%',
+                                                background: checkedInToday ? '#10b981' : undefined,
+                                                transform: checkedInToday ? 'none' : undefined,
+                                                cursor: checkedInToday ? 'default' : 'pointer',
+                                                border: checkedInToday ? 'none' : undefined
+                                            }}
+                                            onClick={checkedInToday ? undefined : handleCheckIn}
+                                            disabled={checkedInToday}
+                                        >
+                                            {checkedInToday ? 'Checked In Successfully ✅' : 'Check In'}
+                                        </button>
                                 </div>
                             </>
                         ) : (

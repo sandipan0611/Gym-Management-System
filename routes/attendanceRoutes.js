@@ -9,8 +9,8 @@ router.use(auth);
 // Members and staff can mark attendance
 router.post('/', markAttendance);
 
-// Only admin and trainers can see all attendance
-router.get('/', authorize('admin', 'trainer'), getAttendance);
-router.get('/:member_id', authorize('admin', 'trainer'), getAttendance);
+// Members and staff can see relevant attendance
+router.get('/', authorize('admin', 'trainer', 'member'), getAttendance);
+router.get('/:member_id', authorize('admin', 'trainer', 'member'), getAttendance);
 
 module.exports = router;

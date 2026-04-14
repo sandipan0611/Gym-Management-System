@@ -102,10 +102,27 @@ const updateProfile = async (userId, data) => {
     return user;
 };
 
+const leaveGym = async (userId) => {
+    // 1. Mark user as removed
+    await db.query(
+        "UPDATE users SET status = 'removed' WHERE id = $1",
+        [userId]
+    );
+
+    // 2. Deactivate all workout assignments for this member
+    await db.query(
+        "UPDATE member_workouts SET is_active = FALSE WHERE member_id = $1",
+        [userId]
+    );
+
+    return { success: true, message: 'You have formally left the gym.' };
+};
+
 module.exports = {
     getMembers,
     getTrainers,
     changePassword,
     getProfile,
-    updateProfile
+    updateProfile,
+    leaveGym
 };

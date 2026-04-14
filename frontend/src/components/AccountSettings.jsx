@@ -50,9 +50,23 @@ const AccountSettings = ({ user, token, onProfileUpdate }) => {
         }
     };
 
+    const handleLeaveGym = async () => {
+        if (!window.confirm('Are you SURE you want to leave the gym? This will deactivate your account and you will no longer be able to log in.')) return;
+        
+        setLoading(true);
+        try {
+            await api.leaveGym(token);
+            alert('Your account has been deactivated. We are sorry to see you go!');
+            if (onProfileUpdate) onProfileUpdate(null); // This will trigger logout in App.jsx if handled
+        } catch (err) {
+            setMessage({ type: 'error', text: err.message || 'Failed to process request' });
+            setLoading(false);
+        }
+    };
+
     return (
-        <div className="premium-container fade-in" style={{ maxWidth: '600px' }}>
-            <div className="premium-card">
+        <div className="premium-container fade-in" style={{ paddingBottom: '5rem' }}>
+            <div className="premium-card" style={{ maxWidth: '600px', margin: '0 auto' }}>
                 <h2 style={{ marginBottom: '2rem', color: 'var(--accent)', fontSize: '1.8rem' }}>Account Settings</h2>
                 
                 {message.text && (
@@ -140,6 +154,24 @@ const AccountSettings = ({ user, token, onProfileUpdate }) => {
                         {loading ? 'Saving Changes...' : 'Save Changes'}
                     </button>
                 </form>
+
+                {/* ── DANGER ZONE ────────────────────────────────────────── */}
+                {user?.role === 'member' && (
+                    <div style={{ marginTop: '4rem', padding: '2rem', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '12px', background: 'rgba(239, 68, 68, 0.05)' }}>
+                        <h3 style={{ color: '#ef4444', marginBottom: '1rem' }}>Danger Zone</h3>
+                        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+                            Once you leave the gym, your account will be deactivated and you will no longer have access to your dashboard or workout plans.
+                        </p>
+                        <button 
+                            onClick={handleLeaveGym}
+                            className="premium-button"
+                            style={{ background: '#ef4444', width: '100%' }}
+                            disabled={loading}
+                        >
+                            Permanently Leave Gym
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );

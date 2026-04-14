@@ -165,6 +165,12 @@ export const updateProfile = (token, data) =>
         body: JSON.stringify(data),
     }).then(handleResponse);
 
+export const leaveGym = (token) =>
+    fetch(`${BASE_URL}/users/leave-gym`, {
+        method: 'PUT',
+        headers: getHeaders(token),
+    }).then(handleResponse);
+
 // ── HEALTH METRICS ────────────────────────────────────────────────────
 export const getMetrics = (token) =>
     fetch(`${BASE_URL}/metrics`, {

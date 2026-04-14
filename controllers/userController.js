@@ -46,4 +46,13 @@ const updateProfile = async (req, res, next) => {
     }
 };
 
-module.exports = { getMembers, getTrainers, changePassword, getProfile, updateProfile };
+const leaveGym = async (req, res, next) => {
+    try {
+        const result = await userService.leaveGym(req.user.id);
+        res.json({ success: true, message: result.message });
+    } catch (err) {
+        next(err);
+    }
+};
+
+module.exports = { getMembers, getTrainers, changePassword, getProfile, updateProfile, leaveGym };

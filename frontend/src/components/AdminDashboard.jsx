@@ -294,6 +294,7 @@ const AdminDashboard = ({
                                         <th style={{ padding: '1rem', color: 'var(--text-muted)' }}>Email</th>
                                         <th style={{ padding: '1rem', color: 'var(--text-muted)' }}>Phone</th>
                                         <th style={{ padding: '1rem', color: 'var(--text-muted)' }}>Age</th>
+                                        <th style={{ padding: '1rem', color: 'var(--text-muted)' }}>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -303,6 +304,18 @@ const AdminDashboard = ({
                                             <td style={{ padding: '1rem', color: 'var(--accent)' }}>{m.email}</td>
                                             <td style={{ padding: '1rem', color: 'var(--text-muted)' }}>{m.phone || 'N/A'}</td>
                                             <td style={{ padding: '1rem' }}>{m.age || 'N/A'}</td>
+                                            <td style={{ padding: '1rem' }}>
+                                                <span style={{ 
+                                                    padding: '0.2rem 0.6rem', 
+                                                    borderRadius: '12px', 
+                                                    fontSize: '0.75rem', 
+                                                    fontWeight: 600,
+                                                    background: m.status === 'active' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                                                    color: m.status === 'active' ? '#10b981' : '#ef4444'
+                                                }}>
+                                                    {m.status?.toUpperCase() || 'ACTIVE'}
+                                                </span>
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>

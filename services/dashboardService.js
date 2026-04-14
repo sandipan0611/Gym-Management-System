@@ -18,7 +18,7 @@ const getTrainerAssignments = async (userId) => {
 
 const getAdminDashboard = async () => {
     const membersCount = await db.query(
-        "SELECT COUNT(*) FROM users WHERE role = 'member'"
+        "SELECT COUNT(*) FROM users WHERE role = 'member' AND status = 'active'"
     );
 
     const trainersCount = await db.query(

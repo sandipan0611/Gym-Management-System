@@ -337,7 +337,7 @@ function App() {
 
         <div style={{ display: 'flex', gap: '1.5rem', fontWeight: '600' }}>
           {token && <span onClick={() => setCurrentPage('dashboard')} className={currentPage === 'dashboard' ? 'active-nav' : 'inactive-nav'}>Dashboard</span>}
-          {user && user.role === 'admin' && <span onClick={() => setCurrentPage('staff')} className={currentPage === 'staff' ? 'active-nav' : 'inactive-nav'}>Staff Management</span>}
+          {user && user.role === 'admin' && <span onClick={() => setCurrentPage('staff')} className={currentPage === 'staff' ? 'active-nav' : 'inactive-nav'}>Management</span>}
           <span onClick={() => setCurrentPage('plans')} className={currentPage === 'plans' ? 'active-nav' : 'inactive-nav'}>Pricing</span>
           {token && <span onClick={() => setCurrentPage('settings')} className={currentPage === 'settings' ? 'active-nav' : 'inactive-nav'}>Settings</span>}
           {token ? (

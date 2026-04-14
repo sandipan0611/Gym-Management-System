@@ -137,6 +137,8 @@ const AdminDashboard = ({
     token
 }) => {
     const [suggestedTrainer, setSuggestedTrainer] = useState(null);
+    const [membersOpen, setMembersOpen] = useState(false);
+    const [trainersOpen, setTrainersOpen] = useState(true);
 
     useEffect(() => {
         if (!token) return;
@@ -145,9 +147,38 @@ const AdminDashboard = ({
             .catch(() => {});
     }, [token, trainers]);
 
+    const CollapsibleHeader = ({ title, isOpen, toggle, count }) => (
+        <div 
+            onClick={toggle}
+            style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center', 
+                padding: '1.25rem', 
+                background: 'rgba(255,255,255,0.03)', 
+                border: '1px solid var(--card-border)',
+                borderRadius: '12px',
+                cursor: 'pointer',
+                marginTop: '1.5rem',
+                transition: 'all 0.3s ease',
+                backdropFilter: 'blur(10px)',
+                userSelect: 'none'
+            }}
+            className="collapsible-header"
+        >
+            <h3 style={{ margin: 0, fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                {title} 
+                <span style={{ fontSize: '0.75rem', background: 'var(--accent)', color: '#fff', padding: '0.15rem 0.6rem', borderRadius: '20px', fontWeight: 600 }}>{count}</span>
+            </h3>
+            <span style={{ fontSize: '1.2rem', color: 'var(--text-muted)', transform: isOpen ? 'rotate(0deg)' : 'rotate(180deg)', transition: 'transform 0.3s ease' }}>▲</span>
+        </div>
+    );
+
     return (
-        <div className="premium-container fade-in" style={{ position: 'relative', zIndex: 10 }}>
-            <h1 style={{ marginBottom: '2rem' }}>Admin Operations</h1>
+        <div className="premium-container fade-in" style={{ paddingBottom: '5rem' }}>
+            <h1 style={{ marginBottom: '2rem', fontSize: '2.5rem', fontWeight: 800 }}>
+                {adminStats ? 'Admin Dashboard' : 'Management'}
+            </h1>
 
             {adminStats ? (
                 <>
@@ -242,44 +273,92 @@ const AdminDashboard = ({
                         </table>
                     </div>
                 </>
-            ) : <p>Loading stats…</p>}
-
-            {/* ── Trainer Cards ─────────────────────────────────────── */}
-            <h3 style={{ marginTop: '3rem', marginBottom: '1rem' }}>Active Trainers</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
-                {trainers.filter(t => t.status === 'active').sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true })).map(t => (
-                    <div key={t.user_id} className="premium-card" style={{ background: 'rgba(21, 24, 40, 0.85)', backdropFilter: 'blur(10px)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                            <h2 style={{ color: 'var(--text-main)', fontSize: '1.1rem' }}>{t.name}</h2>
-                            <span style={{ background: 'rgba(16,185,129,0.15)', color: '#10b981', fontSize: '0.7rem', padding: '0.2rem 0.5rem', borderRadius: '20px', fontWeight: 600 }}>ACTIVE</span>
+            ) : <p style={{ color: 'var(--text-muted)' }}>Loading management data...</p>}
+            
+            <div style={{ marginTop: '2rem' }}>
+                {/* ── MEMBER DETAILS (Collapsible) ─────────────────────────────────── */}
+                <CollapsibleHeader 
+                    title="Member Details" 
+                    isOpen={membersOpen} 
+                    toggle={() => setMembersOpen(!membersOpen)} 
+                    count={members.length} 
+                />
+                
+                {membersOpen && (
+                    <div className="premium-card fade-in" style={{ padding: 0, overflow: 'hidden', marginTop: '1rem', background: 'rgba(21, 24, 40, 0.85)', backdropFilter: 'blur(10px)' }}>
+                        <div style={{ overflowX: 'auto' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                                <thead style={{ background: 'rgba(255,255,255,0.05)' }}>
+                                    <tr>
+                                        <th style={{ padding: '1rem', color: 'var(--text-muted)' }}>Name</th>
+                                        <th style={{ padding: '1rem', color: 'var(--text-muted)' }}>Email</th>
+                                        <th style={{ padding: '1rem', color: 'var(--text-muted)' }}>Phone</th>
+                                        <th style={{ padding: '1rem', color: 'var(--text-muted)' }}>Age</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {[...members].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true })).map(m => (
+                                        <tr key={m.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                                            <td style={{ padding: '1rem', fontWeight: 600 }}>{m.name}</td>
+                                            <td style={{ padding: '1rem', color: 'var(--accent)' }}>{m.email}</td>
+                                            <td style={{ padding: '1rem', color: 'var(--text-muted)' }}>{m.phone || 'N/A'}</td>
+                                            <td style={{ padding: '1rem' }}>{m.age || 'N/A'}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
-                        <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '0.25rem' }}>{t.email}</p>
-                        <p style={{ fontSize: '0.9rem', marginTop: '0.75rem', fontWeight: 600 }}>
-                            {t.specialization}
-                            <span style={{ marginLeft: '0.75rem', color: 'var(--text-muted)', fontWeight: 400, fontSize: '0.85rem' }}>
-                                · {t.member_count ?? 0} member{t.member_count !== 1 ? 's' : ''}
-                            </span>
-                        </p>
-                        <button className="premium-button" style={{ marginTop: '1rem', background: '#e11d48', width: '100%' }} onClick={() => handleFireTrainer(t.user_id)}>Mark Removed</button>
                     </div>
-                ))}
+                )}
+
+                {/* ── TRAINER DETAILS (Collapsible) ───────────────────────────────── */}
+                <CollapsibleHeader 
+                    title="Trainer Details" 
+                    isOpen={trainersOpen} 
+                    toggle={() => setTrainersOpen(!trainersOpen)} 
+                    count={trainers.length} 
+                />
+
+                {trainersOpen && (
+                    <div className="fade-in" style={{ marginTop: '1.5rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+                            {trainers.filter(t => t.status === 'active').sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true })).map(t => (
+                                <div key={t.user_id} className="premium-card" style={{ background: 'rgba(21, 24, 40, 0.85)', backdropFilter: 'blur(10px)' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                        <h2 style={{ color: 'var(--text-main)', fontSize: '1.1rem' }}>{t.name}</h2>
+                                        <span style={{ background: 'rgba(16,185,129,0.15)', color: '#10b981', fontSize: '0.7rem', padding: '0.2rem 0.5rem', borderRadius: '20px', fontWeight: 600 }}>ACTIVE</span>
+                                    </div>
+                                    <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '0.25rem' }}>{t.email}</p>
+                                    <p style={{ fontSize: '0.9rem', marginTop: '0.75rem', fontWeight: 600 }}>
+                                        {t.specialization}
+                                        <span style={{ marginLeft: '0.75rem', color: 'var(--text-muted)', fontWeight: 400, fontSize: '0.85rem' }}>
+                                            · {t.member_count ?? 0} member{t.member_count !== 1 ? 's' : ''}
+                                        </span>
+                                    </p>
+                                    <button className="premium-button" style={{ marginTop: '1rem', background: '#e11d48', width: '100%' }} onClick={() => handleFireTrainer(t.user_id)}>Mark Removed</button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
 
-            {trainers.some(t => t.status === 'removed') && (
+            {trainersOpen && trainers.some(t => t.status === 'removed') && (
                 <>
-                    <h3 style={{ marginTop: '3rem', marginBottom: '1rem' }}>Removed Trainers (Pending Replacements)</h3>
+                    <h3 style={{ marginTop: '3rem', marginBottom: '1rem', color: '#ef4444', fontSize: '1rem' }}>Removed Trainers (Pending Replacements)</h3>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
                         {trainers.filter(t => t.status === 'removed').sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true })).map(t => (
                             <div key={t.user_id} className="premium-card" style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid #e11d48', backdropFilter: 'blur(10px)' }}>
-                                <h2 style={{ color: 'var(--text-muted)' }}>{t.name} <span style={{ fontSize: '0.8rem', color: '#e11d48' }}>(REMOVED)</span></h2>
-                                <p style={{ color: 'var(--text-muted)' }}>{t.email}</p>
+                                <h2 style={{ color: 'var(--text-muted)', fontSize: '1rem' }}>{t.name} <span style={{ fontSize: '0.8rem', color: '#e11d48' }}>(REMOVED)</span></h2>
+                                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{t.email}</p>
                                 <p style={{ fontSize: '0.9rem', marginTop: '0.5rem', fontWeight: 'bold', color: 'var(--text-muted)' }}>Specialization: {t.specialization}</p>
-                                <button className="premium-button" style={{ marginTop: '1rem', background: '#b45309' }} onClick={() => handleReplaceTrainer(t)}>Hire Replacement</button>
+                                <button className="premium-button" style={{ marginTop: '1rem', background: '#b45309', width: '100%' }} onClick={() => handleReplaceTrainer(t)}>Hire Replacement</button>
                             </div>
                         ))}
                     </div>
                 </>
             )}
+
 
             {/* ── Forms ─────────────────────────────────────────────── */}
             <div style={{ marginTop: '3rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>

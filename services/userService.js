@@ -72,17 +72,18 @@ const getProfile = async (userId) => {
 };
 
 const updateProfile = async (userId, data) => {
-    const { name, phone, age, specialization } = data;
+    const { name, phone, age, specialization, email } = data;
     
     // Update users table
     const result = await db.query(
         `UPDATE users
          SET name  = COALESCE($1, name),
              phone = COALESCE($2, phone),
-             age   = COALESCE($3, age)
-         WHERE id = $4
+             age   = COALESCE($3, age),
+             email = COALESCE($4, email)
+         WHERE id = $5
          RETURNING id, name, email, phone, age, role`,
-        [name || null, phone || null, age ? parseInt(age) : null, userId]
+        [name || null, phone || null, age ? parseInt(age) : null, email || null, userId]
     );
 
     const user = result.rows[0];

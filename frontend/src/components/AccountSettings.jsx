@@ -4,6 +4,7 @@ import * as api from '../services/api';
 const AccountSettings = ({ user, token, onProfileUpdate }) => {
     const [formData, setFormData] = useState({
         name: user?.name || '',
+        email: user?.email || '',
         phone: user?.phone || '',
         age: user?.age || '',
         specialization: user?.specialization || ''
@@ -18,6 +19,7 @@ const AccountSettings = ({ user, token, onProfileUpdate }) => {
                 const data = res.data;
                 setFormData({
                     name: data.name || '',
+                    email: data.email || '',
                     phone: data.phone || '',
                     age: data.age || '',
                     specialization: data.specialization || ''
@@ -83,12 +85,12 @@ const AccountSettings = ({ user, token, onProfileUpdate }) => {
                         <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)' }}>Email Address</label>
                         <input
                             type="email"
+                            name="email"
                             className="premium-input"
-                            value={user?.email || ''}
-                            disabled
-                            style={{ opacity: 0.6, cursor: 'not-allowed' }}
+                            value={formData.email}
+                            onChange={handleChange}
+                            required
                         />
-                        <small style={{ color: '#64748b' }}>Email cannot be changed contact admin.</small>
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>

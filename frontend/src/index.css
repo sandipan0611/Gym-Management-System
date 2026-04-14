@@ -133,3 +133,32 @@ h1, h2, h3 {
 .navbar-links a:hover, .navbar-links span:hover {
   color: var(--text-main);
 }
+
+.active-nav, .inactive-nav {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.inactive-nav {
+  color: var(--text-muted);
+}
+
+.inactive-nav:hover {
+  color: var(--text-main);
+}
+
+.active-nav {
+  color: var(--accent);
+}
+
+.active-nav::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: var(--accent);
+  border-radius: 2px;
+}

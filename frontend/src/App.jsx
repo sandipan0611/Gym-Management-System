@@ -66,7 +66,7 @@ function App() {
   useEffect(() => {
     if (currentPage === 'dashboard' && token && user) fetchDashboardData();
     if (currentPage === 'plans') fetchPlans();
-    if (currentPage === 'staff' && token && user?.role === 'admin') fetchStaffData();
+    if (['dashboard', 'staff'].includes(currentPage) && token && user?.role === 'admin') fetchStaffData();
   }, [currentPage, token, user]);
 
   useEffect(() => {

@@ -308,7 +308,7 @@ const AdminDashboard = ({
                         <select name="trainer_id" className="premium-input" style={{ backgroundColor: 'var(--bg-main)' }} required>
                             <option value="" style={{ color: '#000' }}>Select Trainer</option>
                             {trainers.filter(t => t.status === 'active').sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true })).map(t => (
-                                <option key={t.id} value={t.id} style={{ color: '#000' }}>
+                                <option key={t.trainer_id} value={t.trainer_id} style={{ color: '#000' }}>
                                     {t.name} ({t.member_count ?? 0} members)
                                 </option>
                             ))}

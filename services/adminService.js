@@ -151,7 +151,7 @@ const assignMember = async (data) => {
 
 const getMembers = async () => {
     const members = await db.query(
-        "SELECT id, name, email FROM users WHERE role = 'member'"
+        "SELECT id, name, email FROM users WHERE role = 'member' ORDER BY name ASC"
     );
     return members.rows;
 };

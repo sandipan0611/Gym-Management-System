@@ -303,7 +303,9 @@ const AdminDashboard = ({
                     <form onSubmit={handleAssignMember} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         <select name="member_id" className="premium-input" style={{ backgroundColor: 'var(--bg-main)' }} required>
                             <option value="" style={{ color: '#000' }}>Select Member</option>
-                            {members.map(m => <option key={m.id} value={m.id} style={{ color: '#000' }}>{m.name}</option>)}
+                            {[...members].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true })).map(m => (
+                                <option key={m.id} value={m.id} style={{ color: '#000' }}>{m.name}</option>
+                            ))}
                         </select>
                         <select name="trainer_id" className="premium-input" style={{ backgroundColor: 'var(--bg-main)' }} required>
                             <option value="" style={{ color: '#000' }}>Select Trainer</option>

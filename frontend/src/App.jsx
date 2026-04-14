@@ -251,6 +251,7 @@ function App() {
       try {
           await api.createSubscription(token, { plan_id: planId });
           alert(`Successfully subscribed to ${planName}!`);
+          await fetchDashboardData();
           setCurrentPage('dashboard');
       } catch (err) {
           alert(err.message || 'Server failed to process your subscription');

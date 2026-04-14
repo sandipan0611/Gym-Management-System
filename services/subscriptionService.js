@@ -15,6 +15,8 @@ const getSubscriptions = async (user) => {
         query += ' WHERE s.member_id = $1';
         params.push(user.id);
     }
+    
+    query += " ORDER BY (s.status = 'active') DESC, s.start_date DESC";
 
     const subs = await db.query(query, params);
     return subs.rows;

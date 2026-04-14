@@ -1,12 +1,11 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
+// Create the pool using the DATABASE_URL
+// The 'ssl' property is required for cloud hosts like Neon
 const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
 });
 
 pool.connect()

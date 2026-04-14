@@ -126,6 +126,12 @@ const assignMember = async (data) => {
 
     const t_id = trainer_id === '' ? null : trainer_id;
 
+    // 1. Ensure the user is marked as 'active' (in case they were 'removed')
+    await db.query(
+        "UPDATE users SET status = 'active' WHERE id = $1",
+        [member_id]
+    );
+
     const exists = await db.query(
         "SELECT id FROM member_workouts WHERE member_id = $1",
         [member_id]
@@ -134,19 +140,19 @@ const assignMember = async (data) => {
     if (exists.rows.length > 0) {
         await db.query(
             `UPDATE member_workouts 
-             SET trainer_id = $1, workout_id = $2 
+             SET trainer_id = $1, workout_id = $2, is_active = TRUE 
              WHERE member_id = $3`,
             [t_id, workout_id, member_id]
         );
     } else {
         await db.query(
-            `INSERT INTO member_workouts (member_id, trainer_id, workout_id)
-             VALUES ($1, $2, $3)`,
+            `INSERT INTO member_workouts (member_id, trainer_id, workout_id, is_active)
+             VALUES ($1, $2, $3, TRUE)`,
             [member_id, t_id, workout_id]
         );
     }
 
-    return { msg: 'Assignment updated' };
+    return { msg: 'Assignment updated and member reactivated' };
 };
 
 const getMembers = async () => {

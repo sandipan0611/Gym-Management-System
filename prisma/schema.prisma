@@ -59,7 +59,8 @@ model plans {
   subscriptions   subscriptions[]
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This table contains check constraints (status IN ('active', 'expired', 'cancelled')). 
+/// Visit https://pris.ly/d/check-constraints for more info.
 model subscriptions {
   id         Int        @id @default(autoincrement())
   member_id  Int?

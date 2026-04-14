@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS subscriptions (
     plan_id INT REFERENCES plans(id) ON DELETE CASCADE,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
-    status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'expired', 'canceled'))
+    status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'expired', 'cancelled'))
 );
 
 -- 5. Payments Table

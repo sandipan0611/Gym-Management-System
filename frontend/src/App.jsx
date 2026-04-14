@@ -156,7 +156,11 @@ function App() {
           await api.hireTrainer(token, data);
           form.reset();
           fetchStaffData();
-      } catch (err) { console.error(err); }
+          alert('Trainer hired and added to roster.');
+      } catch (err) { 
+          console.error(err);
+          alert(err.message || 'Server failed to hire trainer');
+      }
   };
 
   const handleFireTrainer = async (userId) => {
@@ -165,7 +169,10 @@ function App() {
           await api.fireTrainer(token, userId);
           fetchStaffData();
           if (currentPage === 'dashboard') fetchDashboardData();
-      } catch (err) { console.error(err); }
+      } catch (err) { 
+          console.error(err);
+          alert(err.message || 'Server failed to remove trainer');
+      }
   };
 
   const handleReplaceTrainer = async (t) => {
@@ -179,7 +186,10 @@ function App() {
           await api.replaceTrainer(token, t.user_id, { email: email, password: pwd, age: 25, specialization: t.specialization, name: t.name });
           fetchStaffData();
           alert('Trainer successfully replaced and legacy members reassigned!');
-      } catch (err) { console.error(err); }
+      } catch (err) { 
+          console.error(err);
+          alert(err.message || 'Server failed to replace trainer');
+      }
   };
 
   const handleAssignMember = async (e) => {

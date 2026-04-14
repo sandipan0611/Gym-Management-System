@@ -72,7 +72,9 @@ const getProfile = async (userId) => {
 };
 
 const updateProfile = async (userId, data) => {
-    const { name, phone, age } = data;
+    const { name, phone, age, specialization } = data;
+    
+    // Update users table
     const result = await db.query(
         `UPDATE users
          SET name  = COALESCE($1, name),
@@ -82,7 +84,21 @@ const updateProfile = async (userId, data) => {
          RETURNING id, name, email, phone, age, role`,
         [name || null, phone || null, age ? parseInt(age) : null, userId]
     );
-    return result.rows[0];
+
+    const user = result.rows[0];
+
+    // If specialization is provided and user is a trainer, update trainers table
+    if (specialization !== undefined && user.role === 'trainer') {
+        await db.query(
+            `UPDATE trainers 
+             SET specialization = $1 
+             WHERE user_id = $2`,
+            [specialization, userId]
+        );
+        user.specialization = specialization;
+    }
+
+    return user;
 };
 
 module.exports = {

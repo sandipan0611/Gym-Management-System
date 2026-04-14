@@ -306,6 +306,8 @@ function App() {
                  handleHireTrainer={handleHireTrainer} handleFireTrainer={handleFireTrainer}
                  handleReplaceTrainer={handleReplaceTrainer} handleAssignMember={handleAssignMember}
                  token={token} />;
+      case 'settings':
+        return <AccountSettings user={user} token={token} onProfileUpdate={handleProfileUpdate} />;
       default:
         return <h2>Page Not Found</h2>;
     }
@@ -337,6 +339,7 @@ function App() {
           {token && <span onClick={() => setCurrentPage('dashboard')} className={currentPage === 'dashboard' ? 'active-nav' : 'inactive-nav'}>Dashboard</span>}
           {user && user.role === 'admin' && <span onClick={() => setCurrentPage('staff')} className={currentPage === 'staff' ? 'active-nav' : 'inactive-nav'}>Staff Management</span>}
           <span onClick={() => setCurrentPage('plans')} className={currentPage === 'plans' ? 'active-nav' : 'inactive-nav'}>Pricing</span>
+          {token && <span onClick={() => setCurrentPage('settings')} className={currentPage === 'settings' ? 'active-nav' : 'inactive-nav'}>Settings</span>}
           {token ? (
               <span onClick={handleLogout} style={{ color: '#ef4444', cursor: 'pointer' }}>Logout</span>
           ) : (

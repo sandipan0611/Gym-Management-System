@@ -1,7 +1,20 @@
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const handleResponse = async (response) => {
-    const data = await response.json();
+    let data;
+    try {
+        data = await response.json();
+    } catch (e) {
+        // Fallback for non-JSON error responses (e.g. 502/504 errors)
+        if (!response.ok) {
+            throw {
+                message: `Server Error (${response.status}): The request could not be completed.`,
+                status: response.status
+            };
+        }
+        throw { message: 'Unexpected response from server', status: response.status };
+    }
+
     if (!response.ok) {
         throw { 
             message: data.message || 'Something went wrong', 

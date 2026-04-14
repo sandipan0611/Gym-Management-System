@@ -4,10 +4,11 @@ const db = require('../config/db');
 
 const registerUser = async (data) => {
     const { name, email, password, role, phone, age } = data;
+    const normalizedEmail = email.toLowerCase();
 
     const userExists = await db.query(
-        'SELECT * FROM users WHERE email = $1',
-        [email]
+        'SELECT * FROM users WHERE LOWER(email) = $1',
+        [normalizedEmail]
     );
 
     if (userExists.rows.length > 0) {
@@ -40,7 +41,7 @@ const registerUser = async (data) => {
         `INSERT INTO users (name, email, password, role, phone, age)
          VALUES ($1, $2, $3, $4, $5, $6)
          RETURNING id, name, email, role`,
-        [name, email, hashedPassword, role || 'member', phone, age]
+        [name, normalizedEmail, hashedPassword, role || 'member', phone, age]
     );
 
     return {
@@ -51,10 +52,11 @@ const registerUser = async (data) => {
 
 const loginUser = async (data) => {
     const { email, password } = data;
+    const normalizedEmail = email.toLowerCase();
 
     const user = await db.query(
-        'SELECT * FROM users WHERE email = $1',
-        [email]
+        'SELECT * FROM users WHERE LOWER(email) = $1',
+        [normalizedEmail]
     );
 
     if (user.rows.length === 0) {
@@ -83,7 +85,9 @@ const loginUser = async (data) => {
     const payload = {
         user: {
             id: user.rows[0].id,
-            role: user.rows[0].role
+            role: user.rows[0].role,
+            name: user.rows[0].name,
+            email: user.rows[0].email
         }
     };
 

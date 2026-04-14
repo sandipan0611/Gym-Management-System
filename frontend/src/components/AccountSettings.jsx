@@ -50,14 +50,14 @@ const AccountSettings = ({ user, token, onProfileUpdate }) => {
         }
     };
 
-    const handleLeaveGym = async () => {
-        if (!window.confirm('Are you SURE you want to leave the gym? This will deactivate your account and you will no longer be able to log in.')) return;
+    const handleDeactivate = async () => {
+        if (!window.confirm('Are you SURE you want to deactivate your account? You will be logged out immediately and will need to sign up again to rejoin.')) return;
         
         setLoading(true);
         try {
             await api.leaveGym(token);
             alert('Your account has been deactivated. We are sorry to see you go!');
-            if (onProfileUpdate) onProfileUpdate(null); // This will trigger logout in App.jsx if handled
+            if (onProfileUpdate) onProfileUpdate(null); 
         } catch (err) {
             setMessage({ type: 'error', text: err.message || 'Failed to process request' });
             setLoading(false);
@@ -160,15 +160,15 @@ const AccountSettings = ({ user, token, onProfileUpdate }) => {
                     <div style={{ marginTop: '4rem', padding: '2rem', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '12px', background: 'rgba(239, 68, 68, 0.05)' }}>
                         <h3 style={{ color: '#ef4444', marginBottom: '1rem' }}>Danger Zone</h3>
                         <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
-                            Once you leave the gym, your account will be deactivated and you will no longer have access to your dashboard or workout plans.
+                            Once you deactivate your account, you will no longer have access to your dashboard or workout plans. You can rejoin at any time by signing up again.
                         </p>
                         <button 
-                            onClick={handleLeaveGym}
+                            onClick={handleDeactivate}
                             className="premium-button"
                             style={{ background: '#ef4444', width: '100%' }}
                             disabled={loading}
                         >
-                            Permanently Leave Gym
+                            Deactivate Account
                         </button>
                     </div>
                 )}

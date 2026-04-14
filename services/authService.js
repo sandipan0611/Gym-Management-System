@@ -11,6 +11,23 @@ const registerUser = async (data) => {
     );
 
     if (userExists.rows.length > 0) {
+        if (userExists.rows[0].status === 'removed') {
+            // REACTIVATE ACCOUNT
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt);
+            const reactivatedUser = await db.query(
+                `UPDATE users 
+                 SET name = $1, password = $2, role = $3, phone = $4, age = $5, status = 'active'
+                 WHERE id = $6
+                 RETURNING id, name, email, role`,
+                [name, hashedPassword, role || 'member', phone, age, userExists.rows[0].id]
+            );
+            return {
+                message: 'Account reactivated successfully. Welcome back!',
+                user: reactivatedUser.rows[0]
+            };
+        }
+
         const err = new Error('User already exists');
         err.statusCode = 400;
         throw err;

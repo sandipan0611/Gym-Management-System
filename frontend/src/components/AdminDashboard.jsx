@@ -300,7 +300,12 @@ const AdminDashboard = ({
                                 <tbody>
                                     {[...members].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true })).map(m => (
                                         <tr key={m.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                            <td style={{ padding: '1rem', fontWeight: 600 }}>{m.name}</td>
+                                            <td style={{ 
+                                                padding: '1rem', 
+                                                fontWeight: 600,
+                                                opacity: m.status === 'removed' ? 0.4 : 1,
+                                                color: m.status === 'removed' ? 'var(--text-muted)' : 'inherit'
+                                            }}>{m.name}</td>
                                             <td style={{ padding: '1rem', color: 'var(--accent)' }}>{m.email}</td>
                                             <td style={{ padding: '1rem', color: 'var(--text-muted)' }}>{m.phone || 'N/A'}</td>
                                             <td style={{ padding: '1rem' }}>{m.age || 'N/A'}</td>

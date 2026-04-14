@@ -4,12 +4,12 @@ const reportService = require('./reportService');
 const getTrainerAssignments = async (userId) => {
     const assignments = await db.query(
         `SELECT mw.id as assignment_id, u.name as member_name, u.email as member_email, u.phone, 
-                w.name as workout_name, w.description as workout_desc
+                u.status as member_status, w.name as workout_name, w.description as workout_desc
          FROM member_workouts mw
          JOIN trainers tr ON mw.trainer_id = tr.id
          JOIN users u ON mw.member_id = u.id
          JOIN workouts w ON mw.workout_id = w.id
-         WHERE tr.user_id = $1 AND mw.is_active = TRUE`,
+         WHERE tr.user_id = $1 AND (mw.is_active = TRUE OR u.status = 'removed')`,
         [userId]
     );
 

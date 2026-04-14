@@ -36,9 +36,9 @@ const getAdminDashboard = async () => {
         SELECT mw.id, u_member.name as member_name, u_trainer.name as trainer_name, w.name as workout_name
         FROM member_workouts mw
         JOIN users u_member ON mw.member_id = u_member.id
-        JOIN trainers tr ON mw.trainer_id = tr.id
-        JOIN users u_trainer ON tr.user_id = u_trainer.id
-        JOIN workouts w ON mw.workout_id = w.id
+        LEFT JOIN trainers tr ON mw.trainer_id = tr.id
+        LEFT JOIN users u_trainer ON tr.user_id = u_trainer.id
+        LEFT JOIN workouts w ON mw.workout_id = w.id
         WHERE mw.is_active = TRUE
     `);
 

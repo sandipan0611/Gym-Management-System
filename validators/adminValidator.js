@@ -8,6 +8,6 @@ exports.hireTrainerValidator = [
 
 exports.assignMemberValidator = [
   body("member_id").isInt(),
-  body("trainer_id").isInt(),
+  body("trainer_id").optional({ checkFalsy: true }).isInt(),
   body("workout_id").isInt(),
 ];

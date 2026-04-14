@@ -191,7 +191,10 @@ function App() {
           alert('Member correctly assigned.');
           fetchDashboardData();
           fetchStaffData();
-      } catch (err) { console.error(err); }
+      } catch (err) { 
+          console.error(err);
+          alert(err.message || 'Server failed to save assignment');
+      }
   };
 
   const handleLogin = async (e) => {

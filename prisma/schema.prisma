@@ -29,6 +29,8 @@ model member_metrics {
   @@index([member_id], map: "idx_metrics_member")
 }
 
+/// This table has a database trigger `trg_reactivate_member` attached to it.
+/// On INSERT or UPDATE, it sets `is_active` to TRUE and updates the corresponding `users` record to `status = 'active'`.
 model member_workouts {
   id                                                     Int       @id @default(autoincrement())
   member_id                                              Int?
@@ -93,6 +95,7 @@ model trainers {
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// NOTE: The `status` field may be automatically updated to 'active' by the `trg_reactivate_member` trigger on the `member_workouts` table.
 model users {
   id              Int               @id @default(autoincrement())
   name            String            @db.VarChar(100)

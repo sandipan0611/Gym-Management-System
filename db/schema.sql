@@ -93,3 +93,22 @@ CREATE INDEX IF NOT EXISTS idx_subscriptions_member ON subscriptions(member_id);
 CREATE INDEX IF NOT EXISTS idx_attendance_member ON attendance(member_id);
 CREATE INDEX IF NOT EXISTS idx_member_workouts_member ON member_workouts(member_id);
 CREATE INDEX IF NOT EXISTS idx_metrics_member ON member_metrics(member_id);
+
+-- 10. Triggers for Automation
+-- Automatically reactivates a member and ensures assignment is active when assigned a routine.
+CREATE OR REPLACE FUNCTION reactivate_member_on_assignment()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Reactivate member in users table
+    UPDATE users SET status = 'active' WHERE id = NEW.member_id;
+    -- Ensure is_active is true
+    NEW.is_active = TRUE;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_reactivate_member ON member_workouts;
+CREATE TRIGGER trg_reactivate_member
+BEFORE INSERT OR UPDATE ON member_workouts
+FOR EACH ROW
+EXECUTE FUNCTION reactivate_member_on_assignment();

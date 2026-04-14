@@ -126,12 +126,6 @@ const assignMember = async (data) => {
 
     const t_id = trainer_id === '' ? null : trainer_id;
 
-    // 1. Ensure the user is marked as 'active' (in case they were 'removed')
-    await db.query(
-        "UPDATE users SET status = 'active' WHERE id = $1",
-        [member_id]
-    );
-
     const exists = await db.query(
         "SELECT id FROM member_workouts WHERE member_id = $1",
         [member_id]

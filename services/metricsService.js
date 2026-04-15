@@ -21,7 +21,7 @@ const getMemberMetrics = async (memberId) => {
     const result = await db.query(
         `SELECT * FROM member_metrics
          WHERE member_id = $1
-         ORDER BY recorded_at ASC`,
+         ORDER BY recorded_at DESC`,
         [memberId]
     );
     return result.rows;
